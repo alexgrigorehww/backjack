@@ -1,72 +1,50 @@
 package main
 
 import (
+	"image"
+	"image/color"
 	"log"
-	"github.com/lxn/walk"
-	. "github.com/lxn/walk/declarative"
+	"github.com/hajimehoshi/ebiten"
+
 )
 
-func main() {
-	mw := new(MyMainWindow)
+const (
+	screenWidth  = 400
+	screenHeight = 400
+	fontSize     = 32
+	walletMoney  = 500
+)
 
-	if _, err := (MainWindow{
-		AssignTo: &mw.MainWindow,
-		Title:    "BlackJack",
-		MinSize:  Size{320, 240},
-		Size:     Size{300, 300},
-		Layout:   VBox{MarginsZero: true},
-		Children: []Widget{
-			CustomWidget{
-				AssignTo:            &mw.paintWidget,
-				ClearsBackground:    true,
-				InvalidatesOnResize: true,
-				Paint:               mw.drawStuff,
-			},
-		},
-	}).Run(); err != nil {
+var (
+	buttonStand = &Button{
+		Rect: image.Rect(110, 350, 195, 390),
+		Text: "STAND",
+	}
+
+	buttonHit = &Button{
+		Rect: image.Rect(205, 350, 290, 390),
+		Text: "HIT",
+	}
+)
+
+func update(screen *ebiten.Image) error {
+	buttonStand.Update()
+	buttonHit.Update()
+	if ebiten.IsDrawingSkipped() {
+		return nil
+	}
+
+	screen.Fill(color.RGBA{0xeb, 0xeb, 0xeb, 0xff})
+
+	new(Score).Draw(screen)
+
+	buttonStand.Draw(screen)
+	buttonHit.Draw(screen)
+	return nil
+}
+
+func main() {
+	if err := ebiten.Run(update, screenWidth, screenHeight, 1, "BlackJack"); err != nil {
 		log.Fatal(err)
 	}
-}
-
-type MyMainWindow struct {
-	*walk.MainWindow
-	paintWidget *walk.CustomWidget
-}
-
-func (mw *MyMainWindow) drawStuff(canvas *walk.Canvas, updateBounds walk.Rectangle) error {
-	bounds := mw.paintWidget.ClientBounds()
-
-	rectPen, err := walk.NewCosmeticPen(walk.PenSolid, walk.RGB(255, 0, 0))
-	if err != nil {
-		return err
-	}
-	defer rectPen.Dispose()
-
-	if err := canvas.DrawRectangle(rectPen, bounds); err != nil {
-		return err
-	}
-
-	ellipseBrush, err := walk.NewHatchBrush(walk.RGB(0, 255, 0), walk.HatchCross)
-	if err != nil {
-		return err
-	}
-	defer ellipseBrush.Dispose()
-
-	if err := canvas.FillEllipse(ellipseBrush, bounds); err != nil {
-		return err
-	}
-
-	linesBrush, err := walk.NewSolidColorBrush(walk.RGB(0, 0, 255))
-	if err != nil {
-		return err
-	}
-	defer linesBrush.Dispose()
-
-	linesPen, err := walk.NewGeometricPen(walk.PenDash, 8, linesBrush)
-	if err != nil {
-		return err
-	}
-	defer linesPen.Dispose()
-
-	return nil
 }
