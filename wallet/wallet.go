@@ -4,10 +4,10 @@ type Wallet struct {
 	amount int
 }
 
-func lostMoney(w *Wallet, bet int) int {
+func (w *Wallet) lostMoney(bet int) int {
 	return w.amount - bet
 }
 
-func wonMoney(w *Wallet, bet int) int {
-	return w.amount - bet
+func (w *Wallet) wonMoney(bet int) int {
+	return w.amount + bet
 }
