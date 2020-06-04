@@ -8,7 +8,6 @@ import (
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/gofont/goregular"
 	"github.com/golang/freetype/truetype"
-
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/text"
 	"log"
@@ -68,14 +67,16 @@ func init() {
 		Size:    12,
 		DPI:     72,
 		Hinting: font.HintingFull,
-	})
+	});
 	b, _, _ := uiFont.GlyphBounds('M')
 	uiFontMHeight = (b.Max.Y - b.Min.Y).Ceil()
+
 }
 
 type Button struct {
 	Rect image.Rectangle
 	Text string
+	Color color.RGBA
 
 	mouseDown bool
 
@@ -91,7 +92,6 @@ func (b *Button) Update() {
 			b.mouseDown = false
 		}
 	} else {
-
 		if b.mouseDown {
 			if b.onPressed != nil {
 				b.onPressed(b)
@@ -106,7 +106,7 @@ func (b *Button) Draw(dst *ebiten.Image) {
 	if b.mouseDown {
 		t = imageTypeButtonPressed
 	}
-	drawNinePatches(dst, b.Rect, imageSrcRects[t])
+	drawNinePatches(dst, b.Rect, imageSrcRects[t], b.Color)
 
 	bounds, _ := font.BoundString(uiFont, b.Text)
 	w := (bounds.Max.X - bounds.Min.X).Ceil()
@@ -119,7 +119,7 @@ func (b *Button) SetOnPressed(f func(b *Button)) {
 	b.onPressed = f
 }
 
-func drawNinePatches(dst *ebiten.Image, dstRect image.Rectangle, srcRect image.Rectangle) {
+func drawNinePatches(dst *ebiten.Image, dstRect image.Rectangle, srcRect image.Rectangle, clr color.RGBA) {
 	srcX := srcRect.Min.X
 	srcY := srcRect.Min.Y
 	srcW := srcRect.Dx()
@@ -131,6 +131,11 @@ func drawNinePatches(dst *ebiten.Image, dstRect image.Rectangle, srcRect image.R
 	dstH := dstRect.Dy()
 
 	op := &ebiten.DrawImageOptions{}
+	//op.ColorM.TranslateColor(clr.RGBA())
+	op.ColorM.Scale(colorScale(clr))
+	//	op.ColorM.ChangeHSV(0, 100, 10)
+	//op.ColorM.Apply(clr)
+	//op.ColorM.Scale(0.1, 0.1, 0.1, 0.7)
 	for j := 0; j < 3; j++ {
 		for i := 0; i < 3; i++ {
 			op.GeoM.Reset()
@@ -167,7 +172,39 @@ func drawNinePatches(dst *ebiten.Image, dstRect image.Rectangle, srcRect image.R
 			op.GeoM.Scale(float64(dw)/float64(sw), float64(dh)/float64(sh))
 			op.GeoM.Translate(float64(dx), float64(dy))
 			op.GeoM.Translate(float64(dstX), float64(dstY))
-			dst.DrawImage(uiImage.SubImage(image.Rect(sx, sy, sx+sw, sy+sh)).(*ebiten.Image), op)
+			im := image.Rect(sx, sy, sx+sw, sy+sh)
+			//im.Set(2, 3, color.RGBA{255, 0, 0, 255})
+			img := uiImage.SubImage(im).(*ebiten.Image)
+		//	img.Set(0, 0, clr)
+
+			dst.DrawImage(img, op)
 		}
 	}
+}
+
+func colorToScale(clr color.Color) (float64, float64, float64, float64) {
+	r, g, b, a := clr.RGBA()
+	rf := float64(r) / 0xffff
+	gf := float64(g) / 0xffff
+	bf := float64(b) / 0xffff
+	af := float64(a) / 0xffff
+	// Convert to non-premultiplied alpha components.
+	if 0 < af {
+		rf /= af
+		gf /= af
+		bf /= af
+	}
+	return rf, gf, bf, af
+}
+func colorScale(clr color.Color) (rf, gf, bf, af float64) {
+	r, g, b, a := clr.RGBA()
+	if a == 0 {
+		return 0, 0, 0, 0
+	}
+
+	rf = float64(r)
+	gf = float64(g)
+	bf = float64(b)
+	af = float64(a) / 0xff
+	return
 }
