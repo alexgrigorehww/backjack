@@ -20,18 +20,17 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	const dpi = 72
 	arcadeFont = truetype.NewFace(tt, &truetype.Options{
-		Size:    fontSize,
-		DPI:     dpi,
+		Size:    20,
+		DPI:     72,
 		Hinting: font.HintingFull,
 	})
 }
 type Score struct {
-
+	fontSize int
 }
 
 func (s *Score) Draw(dst *ebiten.Image) {
 	scoreStr := fmt.Sprintf("%04d", walletMoney)
-	text.Draw(dst, scoreStr, arcadeFont, screenWidth-len(scoreStr)*fontSize, fontSize, color.White)
+	text.Draw(dst, scoreStr, arcadeFont, screenWidth-len(scoreStr)*s.fontSize, s.fontSize, color.Black)
 }
