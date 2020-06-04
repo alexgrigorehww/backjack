@@ -1,11 +1,10 @@
 package main
 
 import (
+	"github.com/hajimehoshi/ebiten"
 	"image"
 	"image/color"
 	"log"
-	"github.com/hajimehoshi/ebiten"
-
 )
 
 const (
