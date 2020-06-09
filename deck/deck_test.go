@@ -13,13 +13,12 @@ func checkExpectedCard(i int, card Card) (expectedValue int, ok bool) {
 	if card.value != expectedValue {
 		ok = false
 	}
-	return;
+	return
 }
 
 func TestDeck_Init(t *testing.T) {
 	var deck Deck
 	deck.Init()
-
 	// check cards value
 	for i, card := range deck.cards {
 		expectedValue, ok := checkExpectedCard(i, card)
@@ -28,7 +27,7 @@ func TestDeck_Init(t *testing.T) {
 		}
 	}
 	// check the cards type
-	for i, card := range deck.cards{
+	for i, card := range deck.cards {
 		switch {
 		case i<13:
 			if card.cardType.symbol != '♣' || card.cardType.name != "clubs"{
@@ -53,7 +52,7 @@ func TestDeck_Init(t *testing.T) {
 func TestDeck_Shuffle(t *testing.T){
 	var deck Deck
 	deck.Init()
-	deck.Shuffle()
+	deck.Shuffle(ShuffleAndMixAll)
 	if deck.cards[0].value == 1 && deck.cards[1].value == 2{
 		t.Error("Shuffle seems odd")
 	}
@@ -65,10 +64,10 @@ func TestDeck_Draw(t *testing.T) {
 
 	for left := deck.CardsLeft(); left > 0; left = deck.CardsLeft(){
 		card := deck.Draw()
-		cardIndex := 52-left
+		cardIndex := left-1
 		expectedValue, ok:=checkExpectedCard(cardIndex, card)
 		if !ok {
-			t.Errorf("Draw has an unexpected behaviuor: The %d card should be %d", cardIndex, expectedValue)
+			t.Errorf("Draw has an unexpected behaviuor: The %d card should be %d, but it's %d", cardIndex, expectedValue, card.value)
 		}
 	}
 }

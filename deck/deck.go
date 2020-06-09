@@ -6,45 +6,69 @@ import (
 	"time"
 )
 
+type ShuffleType int
+
+const (
+	ShuffleAvailable = 1
+	ShufflePast      = 2
+	ShuffleAndMixAll = 3
+)
+
 type Deck struct {
-	nextCardIndex int
-	cards [52]Card
+	cards     []Card
+	discarded []Card
 }
 
 func (d *Deck) Init() {
+	d.cards = nil
 	cardTypes := []CardType{{"clubs", '♣'}, {"diamonds", '♦'}, {"hearts", '♥'}, {"spades", '♠'}}
-	tmpCardIndex := 0
 	for cardTypeIndex, _ := range cardTypes {
-		tmpCardIndex = 0
 		for i := 1; i <= 14; i++ {
 			if i == 11 {
 				continue // 11 is ace which is 1
 			}
-			index := cardTypeIndex*13 + tmpCardIndex
-			tmpCardIndex++
-			d.cards[index] = Card{i, &cardTypes[cardTypeIndex]}
+			d.cards = append(d.cards, Card{i, &cardTypes[cardTypeIndex]})
 		}
 	}
 }
 
-func (d *Deck) Shuffle(){
+func (d *Deck) Shuffle(shuffleType ShuffleType){
 	rand.Seed(time.Now().UnixNano())
-	rand.Shuffle(len(d.cards), func(i, j int) {
-		d.cards[i], d.cards[j] = d.cards[j], d.cards[i]
+	var whatToShuffle []Card
+	switch shuffleType {
+	case ShuffleAvailable:
+		whatToShuffle = d.cards
+	case ShufflePast:
+		whatToShuffle = d.discarded
+	case ShuffleAndMixAll:
+		d.cards = append(d.cards, d.discarded...)
+		d.discarded = nil
+		whatToShuffle = d.cards
+	}
+	rand.Shuffle(len(whatToShuffle), func(i, j int) {
+		whatToShuffle[i], whatToShuffle[j] = whatToShuffle[j], whatToShuffle[i]
 	})
 }
 
 func (d *Deck) Draw() Card{
-	if d.nextCardIndex > 51 {
-		d.nextCardIndex = 0
+	if len(d.cards) == 0 {
+		d.Shuffle(ShuffleAndMixAll)
 	}
-	card := d.cards[d.nextCardIndex]
-	d.nextCardIndex++
+	var card Card
+	card, d.cards = d.cards[len(d.cards)-1], d.cards[:len(d.cards)-1]
 	return card
 }
 
+func (d *Deck) discard(cards []Card){
+	d.discarded = append(d.discarded, cards...)
+}
+
+func (d *Deck) discardOne(card Card){
+	d.discarded = append(d.discarded, card)
+}
+
 func (d *Deck) CardsLeft() int{
-	return 52 - d.nextCardIndex
+	return len(d.cards)
 }
 
 func (d *Deck) reveal() {
