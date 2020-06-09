@@ -10,6 +10,7 @@ type CardType struct {
 type Card struct {
 	value    int
 	cardType *CardType
+	IsVisible bool
 }
 
 func (c *Card) GetBlackjackValue() int{
