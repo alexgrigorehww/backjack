@@ -27,7 +27,7 @@ func (d *Deck) Init() {
 			if i == 11 {
 				continue // 11 is ace which is 1
 			}
-			d.cards = append(d.cards, Card{i, &cardTypes[cardTypeIndex]})
+			d.cards = append(d.cards, Card{value: i, cardType: &cardTypes[cardTypeIndex]})
 		}
 	}
 }
