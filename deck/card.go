@@ -8,12 +8,12 @@ type CardType struct {
 }
 
 type Card struct {
-	value    int
-	cardType *CardType
+	value     int
+	cardType  *CardType
 	IsVisible bool
 }
 
-func (c *Card) GetBlackjackValue() int{
+func (c *Card) GetBlackjackValue() int {
 	if c.value > 10 {
 		return c.value - 10
 	}
@@ -37,4 +37,10 @@ func (c *Card) GetDisplayingValue() string {
 	default:
 		return strconv.Itoa(c.value)
 	}
+}
+
+//help with testing
+func (c *Card) SetCard(value int, name string, symbol rune) {
+	c.value = value
+	c.cardType = &CardType{name, symbol}
 }

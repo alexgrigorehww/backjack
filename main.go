@@ -5,8 +5,6 @@ import (
 	"image"
 	"image/color"
 	"log"
-	"github.com/hajimehoshi/ebiten"
-	"golang.org/x/image/colornames"
 	"math/rand"
 )
 

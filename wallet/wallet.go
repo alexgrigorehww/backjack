@@ -4,10 +4,18 @@ type Wallet struct {
 	amount int
 }
 
-func (w *Wallet) lostMoney(bet int) int {
+func (w *Wallet) SetAmount(amount int) {
+	w.amount = amount
+}
+
+func (w *Wallet) GetAmount() int {
+	return w.amount
+}
+
+func (w *Wallet) LostMoney(bet int) int {
 	return w.amount - bet
 }
 
-func (w *Wallet) wonMoney(bet int) int {
+func (w *Wallet) WonMoney(bet int) int {
 	return w.amount + bet
 }
