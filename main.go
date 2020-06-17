@@ -1,7 +1,10 @@
 package main
 
 import (
+	"blackjack/wallet"
 	"fmt"
+	"github.com/hajimehoshi/ebiten"
+	"golang.org/x/image/colornames"
 	"image"
 	"image/color"
 	"log"
@@ -37,21 +40,21 @@ var (
 )
 
 type drawnCard struct {
-	Number string
-	Sign   string
+	Number   string
+	Sign     string
 	IsHidden bool
 }
 
 func init() {
 	playerCards = []drawnCard{
 		drawnCard{"7", "♠", false},
-		drawnCard{"K", "♣",false},
-		drawnCard{"Q", "♦",false},
+		drawnCard{"K", "♣", false},
+		drawnCard{"Q", "♦", false},
 		drawnCard{"Q", "♥", false},
 	}
 	dealerCards = []drawnCard{
-		drawnCard{"7", "♠",true},
-		drawnCard{"A", "♠",false},
+		drawnCard{"7", "♠", true},
+		drawnCard{"A", "♠", false},
 	}
 }
 
@@ -81,9 +84,9 @@ func update(screen *ebiten.Image) error {
 
 func renderCards(screen *ebiten.Image, cards []drawnCard, startY int) {
 	for uk, card := range cards {
-		if(card.IsHidden){
+		if card.IsHidden {
 			drawNinePatches(screen, image.Rect(100+15*uk, startY, 175+15*uk, startY+125), imageSrcRects[imageTypeButton], colornames.Darkgreen)
-		}else{
+		} else {
 			(&Card{
 				Rect:   image.Rect(100+15*uk, startY, 175+15*uk, startY+125),
 				Number: card.Number,
@@ -98,4 +101,6 @@ func main() {
 	if err := ebiten.Run(update, screenWidth, screenHeight, 1, "BlackJack"); err != nil {
 		log.Fatal(err)
 	}
+	w := wallet.Wallet{500}
+	fmt.Print(w.LostMoney(20))
 }
