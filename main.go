@@ -2,13 +2,13 @@ package main
 
 import (
 	"blackjack/wallet"
+	"blackjack/deck"
 	"fmt"
 	"github.com/hajimehoshi/ebiten"
 	"golang.org/x/image/colornames"
 	"image"
 	"image/color"
 	"log"
-	"math/rand"
 )
 
 const (
@@ -19,8 +19,10 @@ const (
 )
 
 var (
-	poli *ebiten.Image
+	poli    *ebiten.Image
+	theDeck *deck.Deck
 )
+
 var (
 	buttonStand = &Button{
 		Rect:  image.Rect(110, 350, 195, 390),
@@ -32,75 +34,92 @@ var (
 		Text:  "HIT",
 		Color: color.RGBA{0xAA, 0xAA, 0xAA, 0xff},
 	}
-	score = &Score{
-		fontSize: 20,
-	}
-	playerCards []drawnCard
-	dealerCards []drawnCard
+	score         = &Score{20}
+	sumCards      = &SumCards{14}
+	playerCards   []drawnCard
+	dealerCards   []drawnCard
+	playerStopped = false
 )
 
 type drawnCard struct {
-	Number   string
-	Sign     string
+	Card     deck.Card
 	IsHidden bool
 }
 
 func init() {
-	playerCards = []drawnCard{
-		drawnCard{"7", "♠", false},
-		drawnCard{"K", "♣", false},
-		drawnCard{"Q", "♦", false},
-		drawnCard{"Q", "♥", false},
-	}
+	theDeck = new(deck.Deck)
+	theDeck.Init()
+	theDeck.Shuffle(deck.ShuffleAndMixAll)
+
+	fmt.Sprintf("%+q", 1)
 	dealerCards = []drawnCard{
-		drawnCard{"7", "♠", true},
-		drawnCard{"A", "♠", false},
+		drawnCard{theDeck.Draw(), true},
+		drawnCard{theDeck.Draw(), false},
 	}
+
+	playerCards = []drawnCard{
+		drawnCard{theDeck.Draw(), false},
+		drawnCard{theDeck.Draw(), false},
+	}
+
 }
 
 func update(screen *ebiten.Image) error {
 	buttonStand.Update()
 	buttonHit.Update()
 	buttonHit.SetOnPressed(func(b *Button) {
-		playerCards = append(playerCards, drawnCard{fmt.Sprintf("%d", rand.Intn(9)+2), "♠", false})
-	})
+		if (!playerStopped) {
+			playerCards = append(playerCards, drawnCard{theDeck.Draw(), false})
+		}
+	});
+	buttonStand.SetOnPressed(func(b *Button) {
+		playerStopped = true
+	});
+	w := new(wallet.Wallet)
+	w.SetAmount(500)
+	w.LostMoney(20)
+
 	if ebiten.IsDrawingSkipped() {
 		return nil
 	}
+
 	screen.Fill(color.RGBA{0xeb, 0xeb, 0xeb, 0xff})
 
 	// dealer cards
-	renderCards(screen, dealerCards, 25)
+	renderCards(screen, dealerCards, 125, 25)
 
 	// player cards
-	renderCards(screen, playerCards, 165)
+	renderCards(screen, playerCards, 100, 165)
 
-	score.Draw(screen)
+	score.Draw(screen, walletMoney)
 	buttonStand.Draw(screen)
 	buttonHit.Draw(screen)
 
 	return nil
 }
 
-func renderCards(screen *ebiten.Image, cards []drawnCard, startY int) {
+func renderCards(screen *ebiten.Image, cards []drawnCard, startX int, startY int) {
+	cardsSum := 0
 	for uk, card := range cards {
 		if card.IsHidden {
-			drawNinePatches(screen, image.Rect(100+15*uk, startY, 175+15*uk, startY+125), imageSrcRects[imageTypeButton], colornames.Darkgreen)
+			drawNinePatches(screen, image.Rect(startX+15*uk, startY, startX+75+15*uk, startY+125), imageSrcRects[imageTypeButton], colornames.Darkgreen)
 		} else {
 			(&Card{
-				Rect:   image.Rect(100+15*uk, startY, 175+15*uk, startY+125),
-				Number: card.Number,
-				Sign:   card.Sign,
+				Rect:   image.Rect(startX+15*uk, startY, startX+75+15*uk, startY+125),
+				Number: card.Card.GetDisplayingValue(),
+				Sign:   card.Card.GetSymbol(),
 			}).Draw(screen)
+			cardsSum = cardsSum + card.Card.GetBlackjackValue()
 		}
-
 	}
+	if (cardsSum >= 21) {
+		playerStopped = true
+	}
+	sumCards.Draw(screen, cardsSum, startX, startY)
 }
 
 func main() {
 	if err := ebiten.Run(update, screenWidth, screenHeight, 1, "BlackJack"); err != nil {
 		log.Fatal(err)
 	}
-	w := wallet.Wallet{500}
-	fmt.Print(w.LostMoney(20))
 }
