@@ -1,8 +1,8 @@
 package main
 
 import (
-	"blackjack/wallet"
 	"blackjack/deck"
+	"blackjack/wallet"
 	"fmt"
 	"github.com/hajimehoshi/ebiten"
 	"golang.org/x/image/colornames"
@@ -53,13 +53,13 @@ func init() {
 
 	fmt.Sprintf("%+q", 1)
 	dealerCards = []drawnCard{
-		drawnCard{theDeck.Draw(), true},
-		drawnCard{theDeck.Draw(), false},
+		drawnCard{*theDeck.Draw(), true},
+		drawnCard{*theDeck.Draw(), false},
 	}
 
 	playerCards = []drawnCard{
-		drawnCard{theDeck.Draw(), false},
-		drawnCard{theDeck.Draw(), false},
+		drawnCard{*theDeck.Draw(), false},
+		drawnCard{*theDeck.Draw(), false},
 	}
 
 }
@@ -68,13 +68,13 @@ func update(screen *ebiten.Image) error {
 	buttonStand.Update()
 	buttonHit.Update()
 	buttonHit.SetOnPressed(func(b *Button) {
-		if (!playerStopped) {
-			playerCards = append(playerCards, drawnCard{theDeck.Draw(), false})
+		if !playerStopped {
+			playerCards = append(playerCards, drawnCard{*theDeck.Draw(), false})
 		}
-	});
+	})
 	buttonStand.SetOnPressed(func(b *Button) {
 		playerStopped = true
-	});
+	})
 	w := new(wallet.Wallet)
 	w.SetAmount(500)
 	w.LostMoney(20)
@@ -112,7 +112,7 @@ func renderCards(screen *ebiten.Image, cards []drawnCard, startX int, startY int
 			cardsSum = cardsSum + card.Card.GetBlackjackValue()
 		}
 	}
-	if (cardsSum >= 21) {
+	if cardsSum >= 21 {
 		playerStopped = true
 	}
 	sumCards.Draw(screen, cardsSum, startX, startY)
