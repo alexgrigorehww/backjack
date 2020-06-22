@@ -9,11 +9,14 @@ type Hand struct {
 }
 
 //Add card to hand
-func (h *Hand) AddCardToHand(c deck.Card) {
-	h.cards = append(h.cards, c)
+func (h *Hand) AddCardToHand(c *deck.Card) {
+	h.cards = append(h.cards, *c)
 }
 
-//
+func (h *Hand) DiscardAllCards() {
+	h.cards = nil
+}
+
 func (h *Hand) GetHandCards() []deck.Card {
 	return h.cards
 }
