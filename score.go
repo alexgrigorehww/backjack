@@ -30,7 +30,7 @@ type Score struct {
 	fontSize int
 }
 
-func (s *Score) Draw(dst *ebiten.Image) {
+func (s *Score) Draw(dst *ebiten.Image, walletMoney int) {
 	scoreStr := fmt.Sprintf("%04d", walletMoney)
 	text.Draw(dst, scoreStr, arcadeFont, screenWidth-len(scoreStr)*s.fontSize, s.fontSize, color.Black)
 }

@@ -15,7 +15,7 @@ type Card struct {
 
 func (c *Card) GetBlackjackValue() int {
 	if c.value > 10 {
-		return c.value - 10
+		return 10
 	}
 	return c.value
 }

@@ -1,4 +1,4 @@
-package deck
+package deck_test
 
 import (
 	"testing"

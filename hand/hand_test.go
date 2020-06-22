@@ -1,4 +1,4 @@
-package hand
+package hand_test
 
 import (
 	"blackjack/deck"
