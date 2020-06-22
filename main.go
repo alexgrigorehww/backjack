@@ -24,6 +24,11 @@ var (
 )
 
 var (
+	buttonNewGame = &Button{
+		Rect:  image.Rect(20, 355, 90, 385),
+		Text:  "New Game",
+		Color: color.RGBA{0x88, 0x88, 0x88, 0xff},
+	}
 	buttonStand = &Button{
 		Rect:  image.Rect(110, 350, 195, 390),
 		Text:  "STAND",
@@ -42,7 +47,7 @@ var (
 )
 
 type drawnCard struct {
-	Card     deck.Card
+	Card     *deck.Card
 	IsHidden bool
 }
 
@@ -50,31 +55,39 @@ func init() {
 	theDeck = new(deck.Deck)
 	theDeck.Init()
 	theDeck.Shuffle(deck.ShuffleAndMixAll)
+	newGame()
+}
+
+func newGame() {
+	playerStopped = false
 
 	fmt.Sprintf("%+q", 1)
 	dealerCards = []drawnCard{
-		drawnCard{*theDeck.Draw(), true},
-		drawnCard{*theDeck.Draw(), false},
+		drawnCard{theDeck.Draw(), true},
+		drawnCard{theDeck.Draw(), false},
 	}
-
 	playerCards = []drawnCard{
-		drawnCard{*theDeck.Draw(), false},
-		drawnCard{*theDeck.Draw(), false},
+		drawnCard{theDeck.Draw(), false},
+		drawnCard{theDeck.Draw(), false},
 	}
-
 }
 
 func update(screen *ebiten.Image) error {
+	buttonNewGame.Update()
 	buttonStand.Update()
 	buttonHit.Update()
 	buttonHit.SetOnPressed(func(b *Button) {
 		if !playerStopped {
-			playerCards = append(playerCards, drawnCard{*theDeck.Draw(), false})
+			playerCards = append(playerCards, drawnCard{theDeck.Draw(), false})
 		}
 	})
 	buttonStand.SetOnPressed(func(b *Button) {
 		playerStopped = true
-	})
+	});
+	buttonNewGame.SetOnPressed(func(b *Button) {
+		newGame();
+	});
+
 	w := new(wallet.Wallet)
 	w.SetAmount(500)
 	w.LostMoney(20)
@@ -92,6 +105,7 @@ func update(screen *ebiten.Image) error {
 	renderCards(screen, playerCards, 100, 165)
 
 	score.Draw(screen, walletMoney)
+	buttonNewGame.Draw(screen)
 	buttonStand.Draw(screen)
 	buttonHit.Draw(screen)
 
