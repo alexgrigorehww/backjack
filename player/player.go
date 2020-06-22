@@ -9,6 +9,7 @@ type Player interface {
 	Win(int) int
 	Lose(int) int
 	DrawCard(deck.Deck) deck.Card
-	Discard()
+	DiscardAllCards(deck *deck.Deck)
 	GetHandScore() int
+	GetCards() []*deck.Card
 }
