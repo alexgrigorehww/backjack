@@ -5,19 +5,19 @@ import (
 )
 
 type Hand struct {
-	cards []deck.Card
+	cards []*deck.Card
 }
 
 //Add card to hand
 func (h *Hand) AddCardToHand(c *deck.Card) {
-	h.cards = append(h.cards, *c)
+	h.cards = append(h.cards, c)
 }
 
 func (h *Hand) DiscardAllCards() {
 	h.cards = nil
 }
 
-func (h *Hand) GetHandCards() []deck.Card {
+func (h *Hand) GetHandCards() []*deck.Card {
 	return h.cards
 }
 

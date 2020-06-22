@@ -15,8 +15,8 @@ const (
 )
 
 type Deck struct {
-	cards     []Card
-	discarded []Card
+	cards     []*Card
+	discarded []*Card
 }
 
 func (d *Deck) Init() {
@@ -27,14 +27,14 @@ func (d *Deck) Init() {
 			if i == 11 {
 				continue // 11 is ace which is 1
 			}
-			d.cards = append(d.cards, Card{value: i, cardType: &cardTypes[cardTypeIndex]})
+			d.cards = append(d.cards, &Card{value: i, cardType: &cardTypes[cardTypeIndex]})
 		}
 	}
 }
 
 func (d *Deck) Shuffle(shuffleType ShuffleType){
 	rand.Seed(time.Now().UnixNano())
-	var whatToShuffle []Card
+	var whatToShuffle []*Card
 	switch shuffleType {
 	case ShuffleAvailable:
 		whatToShuffle = d.cards
@@ -50,20 +50,24 @@ func (d *Deck) Shuffle(shuffleType ShuffleType){
 	})
 }
 
-func (d *Deck) Draw() Card{
+func (d *Deck) Draw() *Card{
 	if len(d.cards) == 0 {
 		d.Shuffle(ShuffleAndMixAll)
 	}
-	var card Card
+	var card *Card
 	card, d.cards = d.cards[len(d.cards)-1], d.cards[:len(d.cards)-1]
 	return card
 }
 
-func (d *Deck) discard(cards []Card){
+func (d *Deck) Discard(cards []*Card){
+	for _, card := range cards{
+		card.IsVisible = false
+	}
 	d.discarded = append(d.discarded, cards...)
 }
 
-func (d *Deck) discardOne(card Card){
+func (d *Deck) DiscardOne(card *Card){
+	card.IsVisible = false
 	d.discarded = append(d.discarded, card)
 }
 

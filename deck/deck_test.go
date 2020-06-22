@@ -1,4 +1,4 @@
-package deck_test
+package deck
 
 import (
 	"testing"
@@ -21,7 +21,7 @@ func TestDeck_Init(t *testing.T) {
 	deck.Init()
 	// check cards value
 	for i, card := range deck.cards {
-		expectedValue, ok := checkExpectedCard(i, card)
+		expectedValue, ok := checkExpectedCard(i, *card)
 		if !ok {
 			t.Errorf("The %d card should be %d", i, expectedValue)
 		}
@@ -65,7 +65,7 @@ func TestDeck_Draw(t *testing.T) {
 	for left := deck.CardsLeft(); left > 0; left = deck.CardsLeft(){
 		card := deck.Draw()
 		cardIndex := left-1
-		expectedValue, ok:=checkExpectedCard(cardIndex, card)
+		expectedValue, ok:=checkExpectedCard(cardIndex, *card)
 		if !ok {
 			t.Errorf("Draw has an unexpected behaviuor: The %d card should be %d, but it's %d", cardIndex, expectedValue, card.value)
 		}

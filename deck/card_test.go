@@ -1,46 +1,54 @@
 package deck_test
 
 import (
+	"blackjack/deck"
 	"testing"
 )
 
 func TestCard_GetDisplayingValue(t *testing.T) {
-	if (&Card{value: 10}).GetDisplayingValue() != "10" {
+	var card1, card2, card3, card4, card5 deck.Card
+	card1.SetCard(10, "", ' ')
+	if card1.GetDisplayingValue() != "10" {
 		t.Error("10 should be string 10")
 	}
-
-	if (&Card{value: 12}).GetDisplayingValue() != "J" {
+	card2.SetCard(12, "", ' ')
+	if card2.GetDisplayingValue() != "J" {
 		t.Error("12 should be J")
 	}
-
-	if (&Card{value: 13}).GetDisplayingValue() != "Q" {
+	card3.SetCard(13, "", ' ')
+	if card3.GetDisplayingValue() != "Q" {
 		t.Error("13 should be Q")
 	}
-
-	if (&Card{value: 14}).GetDisplayingValue() != "K" {
+	card4.SetCard(14, "", ' ')
+	if card4.GetDisplayingValue() != "K" {
 		t.Error("14 should be K")
 	}
-
-	if (&Card{value: 1}).GetDisplayingValue() != "A" {
+	card5.SetCard(1, "", ' ')
+	if card5.GetDisplayingValue() != "A" {
 		t.Error("1 should be A")
 	}
 }
 
 func TestCard_GetSymbol(t *testing.T) {
-	cardType := CardType{symbol: 'S'}
-	if (&Card{cardType: &cardType}).GetSymbol() != "S" {
+	var card deck.Card
+	card.SetCard(1,"", 'S')
+	if card.GetSymbol() != "S" {
 		t.Error("Card symbol S should be displayed as string S")
 	}
 }
 
 func TestCard_GetBlackjackValue(t *testing.T) {
-	if (&Card{value: 10}).GetBlackjackValue() != 10 {
+	var card1, card2, card3 deck.Card
+	card1.SetCard(10, "", ' ')
+	if card1.GetBlackjackValue() != 10 {
 		t.Error("10 should be 10")
 	}
-	if (&Card{value: 5}).GetBlackjackValue() != 5 {
+	card2.SetCard(5, "", ' ')
+	if card2.GetBlackjackValue() != 5 {
 		t.Error("5 should be 5")
 	}
-	if (&Card{value: 14}).GetBlackjackValue() != 4 {
-		t.Error("14 should be 4")
+	card3.SetCard(14, "", ' ')
+	if card3.GetBlackjackValue() != 10 {
+		t.Error("14 should be 10")
 	}
 }
