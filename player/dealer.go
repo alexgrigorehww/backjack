@@ -38,3 +38,7 @@ func (dealer *Dealer) DiscardAllCards(deck *deck.Deck){
 func (dealer *Dealer) GetHandScore() int{
 	return dealer.hand.GetHandCardsSum()
 }
+
+func (dealer *Dealer) GetCards() []*deck.Card{
+	return dealer.hand.GetHandCards()
+}
