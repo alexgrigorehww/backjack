@@ -41,6 +41,7 @@ var (
 	}
 	score         = &Score{20}
 	sumCards      = &SumCards{14}
+	bustText      = &RenderText{14 , colornames.Black}
 	playerCards   []drawnCard
 	dealerCards   []drawnCard
 	playerStopped = false
@@ -63,8 +64,8 @@ func newGame() {
 
 	fmt.Sprintf("%+q", 1)
 	dealerCards = []drawnCard{
-		drawnCard{theDeck.Draw(), true},
 		drawnCard{theDeck.Draw(), false},
+		drawnCard{theDeck.Draw(), true},
 	}
 	playerCards = []drawnCard{
 		drawnCard{theDeck.Draw(), false},
@@ -83,11 +84,10 @@ func update(screen *ebiten.Image) error {
 	})
 	buttonStand.SetOnPressed(func(b *Button) {
 		playerStopped = true
-	});
+	})
 	buttonNewGame.SetOnPressed(func(b *Button) {
-		newGame();
-	});
-
+		newGame()
+	})
 	w := new(wallet.Wallet)
 	w.SetAmount(500)
 	w.LostMoney(20)
@@ -96,7 +96,11 @@ func update(screen *ebiten.Image) error {
 		return nil
 	}
 
+	// Fill background
 	screen.Fill(color.RGBA{0xeb, 0xeb, 0xeb, 0xff})
+
+	// Draw wallet
+	score.Draw(screen, walletMoney)
 
 	// dealer cards
 	renderCards(screen, dealerCards, 125, 25)
@@ -104,7 +108,6 @@ func update(screen *ebiten.Image) error {
 	// player cards
 	renderCards(screen, playerCards, 100, 165)
 
-	score.Draw(screen, walletMoney)
 	buttonNewGame.Draw(screen)
 	buttonStand.Draw(screen)
 	buttonHit.Draw(screen)
@@ -128,6 +131,10 @@ func renderCards(screen *ebiten.Image, cards []drawnCard, startX int, startY int
 	}
 	if cardsSum >= 21 {
 		playerStopped = true
+	}
+	if(cardsSum > 21){
+		//render BUST
+		bustText.Draw(screen, "BUST", startX + 75/2, startY + 125/2)
 	}
 	sumCards.Draw(screen, cardsSum, startX, startY)
 }

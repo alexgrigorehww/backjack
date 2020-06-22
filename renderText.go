@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"image/color"
 	"log"
 	"golang.org/x/image/font"
@@ -12,7 +11,7 @@ import (
 )
 
 var (
-	sumCardsFont font.Face
+	renderTextFont font.Face
 )
 
 func init() {
@@ -20,18 +19,18 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	sumCardsFont = truetype.NewFace(tt, &truetype.Options{
+	renderTextFont = truetype.NewFace(tt, &truetype.Options{
 		Size:    20,
 		DPI:     72,
 		Hinting: font.HintingFull,
 	})
 }
 
-type SumCards struct {
+type RenderText struct {
 	fontSize int
+	color color.RGBA
 }
 
-func (s *SumCards) Draw(dst *ebiten.Image, sumCards int, startX int, startY int) {
-	nrStr := fmt.Sprintf("%2d", sumCards)
-	text.Draw(dst, nrStr, sumCardsFont, startX - len(nrStr)*s.fontSize, startY + s.fontSize, color.Black)
+func (s *RenderText) Draw(dst *ebiten.Image, renderText string, startX int, startY int) {
+	text.Draw(dst, renderText, renderTextFont, startX, startY, s.color)
 }

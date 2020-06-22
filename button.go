@@ -70,7 +70,6 @@ func init() {
 	});
 	b, _, _ := uiFont.GlyphBounds('M')
 	uiFontMHeight = (b.Max.Y - b.Min.Y).Ceil()
-
 }
 
 type Button struct {
