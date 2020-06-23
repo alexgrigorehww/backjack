@@ -41,10 +41,11 @@ var (
 	}
 	score         = &Score{20}
 	sumCards      = &SumCards{14}
-	bustText      = &RenderText{14 , colornames.Black}
+	bustText      = &RenderText{14, colornames.Black}
 	playerCards   []drawnCard
 	dealerCards   []drawnCard
 	playerStopped = false
+	cardSum       = map[string]int{"dealer": 0, "player": 0}
 )
 
 type drawnCard struct {
@@ -96,6 +97,7 @@ func update(screen *ebiten.Image) error {
 		return nil
 	}
 
+//	bustText.Draw(screen, "Black Jack!", startX+75/2, startY+125/2)
 	// Fill background
 	screen.Fill(color.RGBA{0xeb, 0xeb, 0xeb, 0xff})
 
@@ -103,11 +105,14 @@ func update(screen *ebiten.Image) error {
 	score.Draw(screen, walletMoney)
 
 	// dealer cards
-	renderCards(screen, dealerCards, 125, 25)
+	cardsDealer := renderCards(screen, dealerCards, 125, 25)
+	renderEndGame(screen, cardsDealer, 100, 165)
 
 	// player cards
-	renderCards(screen, playerCards, 100, 165)
+	nrCards := renderCards(screen, playerCards, 100, 165)
+	renderEndGame(screen, nrCards, 100, 165)
 
+	// render buttons
 	buttonNewGame.Draw(screen)
 	buttonStand.Draw(screen)
 	buttonHit.Draw(screen)
@@ -115,7 +120,7 @@ func update(screen *ebiten.Image) error {
 	return nil
 }
 
-func renderCards(screen *ebiten.Image, cards []drawnCard, startX int, startY int) {
+func renderCards(screen *ebiten.Image, cards []drawnCard, startX int, startY int) int{
 	cardsSum := 0
 	for uk, card := range cards {
 		if card.IsHidden {
@@ -129,14 +134,25 @@ func renderCards(screen *ebiten.Image, cards []drawnCard, startX int, startY int
 			cardsSum = cardsSum + card.Card.GetBlackjackValue()
 		}
 	}
+
 	if cardsSum >= 21 {
 		playerStopped = true
 	}
-	if(cardsSum > 21){
-		//render BUST
-		bustText.Draw(screen, "BUST", startX + 75/2, startY + 125/2)
-	}
+
 	sumCards.Draw(screen, cardsSum, startX, startY)
+
+	return cardsSum
+}
+
+func renderEndGame(screen *ebiten.Image, cardsSum int, startX int, startY int) {
+	if (cardsSum > 21) {
+		//render BUST
+		bustText.Draw(screen, "BUST", startX+75/2, startY+125/2)
+	}
+	if (cardsSum == 21) {
+		//render BUST
+		bustText.Draw(screen, "Black Jack!", startX+75/2, startY+125/2)
+	}
 }
 
 func main() {

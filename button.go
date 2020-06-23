@@ -195,6 +195,7 @@ func colorToScale(clr color.Color) (float64, float64, float64, float64) {
 	}
 	return rf, gf, bf, af
 }
+
 func colorScale(clr color.Color) (rf, gf, bf, af float64) {
 	r, g, b, a := clr.RGBA()
 	if a == 0 {

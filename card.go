@@ -70,5 +70,4 @@ func (c *Card) Draw(dst *ebiten.Image) {
 
 	//text.Draw(screen, "♠ ♣ ", fontCard, 50, 50, color.Black)
 	//text.Draw(screen, "♦ ♥", fontCard, 50, 100, colornames.Red)
-
 }
