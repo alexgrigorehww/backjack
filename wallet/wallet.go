@@ -13,9 +13,11 @@ func (w *Wallet) GetAmount() int {
 }
 
 func (w *Wallet) LostMoney(bet int) int {
-	return w.amount - bet
+	w.amount -= bet
+	return w.amount
 }
 
 func (w *Wallet) WonMoney(bet int) int {
-	return w.amount + bet
+	w.amount += bet
+	return w.amount
 }
