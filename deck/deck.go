@@ -75,6 +75,10 @@ func (d *Deck) CardsLeft() int{
 	return len(d.cards)
 }
 
+func (d *Deck) GetDiscarded() []*Card{
+	return d.discarded
+}
+
 func (d *Deck) reveal() {
 	for i, card := range d.cards {
 		fmt.Printf("Card %d: \t %s \n", i, card.GetDisplayingValue()+card.GetSymbol())

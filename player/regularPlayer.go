@@ -8,8 +8,13 @@ import (
 
 type RegularPlayer struct {
 	score int
-	hand hand.Hand
-	wallet wallet.Wallet
+	hand *hand.Hand
+	wallet *wallet.Wallet
+}
+
+func (regularPlayer *RegularPlayer) Init(){
+	regularPlayer.hand = new(hand.Hand)
+	regularPlayer.wallet = new(wallet.Wallet)
 }
 
 func (regularPlayer *RegularPlayer) GetScore() int{
@@ -39,4 +44,12 @@ func (regularPlayer *RegularPlayer) DiscardAllCards(deck *deck.Deck){
 
 func (regularPlayer *RegularPlayer) GetHandScore() int{
 	return regularPlayer.hand.GetHandCardsSum()
+}
+
+func (regularPlayer *RegularPlayer) GetCards() []*deck.Card{
+	return regularPlayer.hand.GetHandCards()
+}
+
+func (regularPlayer *RegularPlayer) GetWalletAmount() int{
+	return regularPlayer.wallet.GetAmount()
 }

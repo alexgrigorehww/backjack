@@ -7,14 +7,17 @@ import (
 )
 
 func TestDealer_GetScore(t *testing.T) {
-	score := (&player.Dealer{}).GetScore()
+	var dealer player.Dealer
+	dealer.Init()
+	score := dealer.GetScore()
 	if score != 0 {
 		t.Errorf("The dealer score should be %d when is just created", 0)
 	}
 }
 
 func TestDealer_Win(t *testing.T) {
-	dealer := &player.Dealer{}
+	var dealer player.Dealer
+	dealer.Init()
 	dealer.Win(2312)
 	score := dealer.GetScore()
 	if score != 1 {
@@ -23,7 +26,8 @@ func TestDealer_Win(t *testing.T) {
 }
 
 func TestDealer_Loose(t *testing.T){
-	dealer := &player.Dealer{}
+	var dealer player.Dealer
+	dealer.Init()
 	dealer.Loose(2312)
 	score := dealer.GetScore()
 	if score != - 1 {
@@ -34,7 +38,8 @@ func TestDealer_Loose(t *testing.T){
 func TestDealer_DrawCard(t *testing.T){
 	var deck deck.Deck
 	deck.Init()
-	dealer := player.Dealer{}
+	var dealer player.Dealer
+	dealer.Init()
 	dealer.DrawCard(&deck)
 	if len(dealer.GetCards()) != 1{
 		t.Error("Dealer should have 1 card")
@@ -56,10 +61,27 @@ func TestDealer_DrawCard(t *testing.T){
 	}
 	card2 := dealer.GetCards()[1]
 	if card2.IsVisible {
-		t.Error("Dealer's first card should be hidden")
+		t.Error("Dealer's second card should be hidden")
 	}
 	card3 := dealer.GetCards()[2]
 	if !card3.IsVisible {
-		t.Error("Dealer's first card should be visible")
+		t.Error("Dealer's third card should be visible")
+	}
+}
+
+func TestDealer_DiscardAllCards(t *testing.T) {
+	var deck deck.Deck
+	deck.Init()
+	var dealer player.Dealer
+	dealer.Init()
+	dealer.DrawCard(&deck)
+	dealer.DrawCard(&deck)
+	dealer.DrawCard(&deck)
+	dealer.DiscardAllCards(&deck)
+	if len(dealer.GetCards()) != 0 {
+		t.Error("After discarding all cards, in hand should be 0 cards")
+	}
+	if len(deck.GetDiscarded()) != 3 {
+		t.Error("After discarding all cards, in hand should be 0 cards")
 	}
 }

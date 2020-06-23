@@ -7,7 +7,11 @@ import (
 
 type Dealer struct {
 	score int
-	hand hand.Hand
+	hand *hand.Hand
+}
+
+func (dealer *Dealer) Init(){
+	dealer.hand = new(hand.Hand)
 }
 
 func (dealer *Dealer) GetScore() int{
@@ -41,4 +45,8 @@ func (dealer *Dealer) GetHandScore() int{
 
 func (dealer *Dealer) GetCards() []*deck.Card{
 	return dealer.hand.GetHandCards()
+}
+
+func (_ *Dealer) GetWalletAmount() int{
+	return 0
 }

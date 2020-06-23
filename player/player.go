@@ -6,10 +6,11 @@ import (
 
 type Player interface {
 	GetScore() int
-	Win(int) int
-	Lose(int) int
-	DrawCard(deck.Deck) deck.Card
-	DiscardAllCards(deck *deck.Deck)
+	Win(int)
+	Loose(int)
+	DrawCard(*deck.Deck)
+	DiscardAllCards(*deck.Deck)
 	GetHandScore() int
 	GetCards() []*deck.Card
+	GetWalletAmount() int
 }
