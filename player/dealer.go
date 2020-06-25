@@ -18,20 +18,23 @@ func (dealer *Dealer) GetScore() int{
 	return dealer.score
 }
 
-func (dealer *Dealer) Win(_ int){
+func (dealer *Dealer) Win() int{
 	dealer.score++
+	return 0
 }
 
-func (dealer *Dealer) Loose(_ int){
+func (dealer *Dealer) Loose() int{
 	dealer.score--
+	return 0
 }
 
-func (dealer *Dealer) DrawCard(deck *deck.Deck){
+func (dealer *Dealer) DrawCard(deck *deck.Deck) *deck.Card{
 	card := deck.Draw()
 	dealer.hand.AddCardToHand(card)
 	if len(dealer.hand.GetHandCards()) != 2{
 		card.IsVisible = true
 	}
+	return card
 }
 
 func (dealer *Dealer) DiscardAllCards(deck *deck.Deck){
@@ -43,10 +46,40 @@ func (dealer *Dealer) GetHandScore() int{
 	return dealer.hand.GetHandCardsSum()
 }
 
+func (dealer *Dealer) GetHandScores() []int{
+	return dealer.hand.DisplayValues()
+}
+
 func (dealer *Dealer) GetCards() []*deck.Card{
 	return dealer.hand.GetHandCards()
 }
 
 func (_ *Dealer) GetWalletAmount() int{
 	return 0
+}
+
+func (dealer *Dealer)IsBusted() bool{
+	busted := true
+	handScores := dealer.hand.DisplayValues()
+
+	for _, score := range handScores {
+		if score < 21{
+			busted = false
+			break
+		}
+	}
+	return busted
+}
+
+func (dealer *Dealer)IsBlackjack() bool{
+	isBlackjack := false
+	handScores := dealer.hand.DisplayValues()
+
+	for _, score := range handScores {
+		if score == 21 {
+			isBlackjack = true
+			break
+		}
+	}
+	return isBlackjack
 }

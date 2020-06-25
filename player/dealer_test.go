@@ -18,7 +18,7 @@ func TestDealer_GetScore(t *testing.T) {
 func TestDealer_Win(t *testing.T) {
 	var dealer player.Dealer
 	dealer.Init()
-	dealer.Win(2312)
+	dealer.Win()
 	score := dealer.GetScore()
 	if score != 1 {
 		t.Errorf("The dealer score should be %d after winning", 1)
@@ -28,7 +28,7 @@ func TestDealer_Win(t *testing.T) {
 func TestDealer_Loose(t *testing.T){
 	var dealer player.Dealer
 	dealer.Init()
-	dealer.Loose(2312)
+	dealer.Loose()
 	score := dealer.GetScore()
 	if score != - 1 {
 		t.Errorf("The dealer score should be %d after winning", - 1)

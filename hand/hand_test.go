@@ -78,4 +78,14 @@ func TestHand_DisplayValues(t *testing.T) {
 	if h.DisplayValues()[0] != 10 && h.DisplayValues()[1] != 20 {
 		t.Error("sMion should be 10 and sMax should be 20", h.DisplayValues())
 	}
+
+	//case: 3 aces
+	h = hand.Hand{}
+	c1.SetCard(1, "spades", '♠')
+	h.AddCardToHand(&c1)
+	h.AddCardToHand(&c1)
+	h.AddCardToHand(&c1)
+	if h.DisplayValues()[0] != 3 {
+		t.Error("This should be 3.", h.DisplayValues())
+	}
 }

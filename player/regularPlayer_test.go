@@ -17,12 +17,14 @@ func TestRegularPlayer_Win(t *testing.T) {
 	bet := 100
 	var regularPlayer player.RegularPlayer
 	regularPlayer.Init()
-	regularPlayer.Win(bet)
+	initAmount := regularPlayer.GetWalletAmount()
+	regularPlayer.Bet = bet
+	regularPlayer.Win()
 	score := regularPlayer.GetScore()
 	if score != 1 {
 		t.Errorf("The regularPlayer score should be %d after winning", 1)
 	}
-	if regularPlayer.GetWalletAmount() != bet{
+	if regularPlayer.GetWalletAmount() != initAmount + bet{
 		t.Errorf("The regularPlayer wallet amount should be %d after winning", bet)
 	}
 }
@@ -31,12 +33,14 @@ func TestRegularPlayer_Loose(t *testing.T){
 	bet := 10
 	var regularPlayer player.RegularPlayer
 	regularPlayer.Init()
-	regularPlayer.Loose(bet)
+	initAmount := regularPlayer.GetWalletAmount()
+	regularPlayer.Bet = bet
+	regularPlayer.Loose()
 	score := regularPlayer.GetScore()
 	if score != - 1 {
 		t.Errorf("The regularPlayer score should be %d after winning", - 1)
 	}
-	if regularPlayer.GetWalletAmount() != -bet{
+	if regularPlayer.GetWalletAmount() != initAmount -bet{
 		t.Errorf("The regularPlayer wallet amount should be %d after winning", -bet)
 	}
 }
