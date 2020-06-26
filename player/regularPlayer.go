@@ -86,3 +86,7 @@ func (regularPlayer *RegularPlayer)IsBlackjack() bool{
 	}
 	return isBlackjack
 }
+
+func (regularPlayer *RegularPlayer) getHandCards() []*deck.Card{
+	return regularPlayer.hand.GetHandCards()
+}

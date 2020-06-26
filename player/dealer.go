@@ -59,19 +59,10 @@ func (_ *Dealer) GetWalletAmount() int{
 }
 
 func (dealer *Dealer)IsBusted() bool{
-	busted := true
-	handScores := dealer.hand.DisplayValues()
-
-	for _, score := range handScores {
-		if score < 21{
-			busted = false
-			break
-		}
-	}
-	return busted
+	return dealer.hand.GetHandCardsSum() > 21
 }
 
-func (dealer *Dealer)IsBlackjack() bool{
+func (dealer *Dealer) IsBlackjack() bool{
 	isBlackjack := false
 	handScores := dealer.hand.DisplayValues()
 
@@ -82,4 +73,8 @@ func (dealer *Dealer)IsBlackjack() bool{
 		}
 	}
 	return isBlackjack
+}
+
+func (dealer *Dealer) getHandCards() []*deck.Card{
+	return dealer.hand.GetHandCards()
 }

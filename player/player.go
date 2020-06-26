@@ -16,4 +16,5 @@ type Player interface {
 	GetWalletAmount() int
 	IsBusted() bool
 	IsBlackjack() bool
+	getHandCards() []*deck.Card
 }

@@ -110,7 +110,7 @@ func (gameplay *SinglePlayer) Stand() (err error){
 		if dealerScore >= 17 {
 			gameplay.evaluate()
 			gameplay.whatsNext = nextStepNewGame
-			renderCleanTableWithBettingOptions(gameplay)
+			gameplay.NewGame()
 			break
 		}
 	}
@@ -137,7 +137,10 @@ func playerDrawCard(gameplay *SinglePlayer) bool{
 	if gameplay.player.IsBusted(){
 		gameplay.player.Loose()
 		gameplay.whatsNext = nextStepNewGame
+		renderCards(gameplay.dealer)
+		renderCards(gameplay.player)
 		renderPlayerBusted()
+		gameplay.NewGame()
 		return true
 	}
 	if gameplay.player.IsBlackjack(){
@@ -153,8 +156,11 @@ func dealerDrawCard(gameplay *SinglePlayer) bool{
 	renderDealerCardAdded(card, scores)
 	if gameplay.dealer.IsBusted(){
 		gameplay.player.Win()
-		renderPlayerWins(gameplay)
+		renderCards(gameplay.dealer)
+		renderCards(gameplay.player)
+		renderPlayerWins()
 		gameplay.whatsNext = nextStepNewGame
+		gameplay.NewGame()
 		return true
 	}
 	return false
@@ -167,30 +173,51 @@ func (gameplay *SinglePlayer) evaluate() {
 	if dealerBlackjack && playerBlackjack{
 		gameplay.player.Bet /= 2
 		gameplay.player.Win()
+		renderCards(gameplay.dealer)
+		renderCards(gameplay.player)
 		renderDraw()
 		return
 	}
 	if dealerBlackjack{
 		gameplay.dealer.Win()
+		gameplay.player.Loose()
+		renderCards(gameplay.dealer)
+		renderCards(gameplay.player)
 		renderDealerWins()
 		return
 	}
 	if playerBlackjack{
 		gameplay.player.Win()
-		renderPlayerWins(gameplay)
+		renderCards(gameplay.dealer)
+		renderCards(gameplay.player)
+		renderPlayerWins()
 		return
 	}
+	println(gameplay.player.GetHandScore())
+	println(gameplay.dealer.GetHandScore())
 	if gameplay.player.GetHandScore() > gameplay.dealer.GetHandScore() {
 		gameplay.player.Win()
-		renderPlayerWins(gameplay)
-	} else {
+		renderCards(gameplay.dealer)
+		renderCards(gameplay.player)
+		renderPlayerWins()
+	} else if gameplay.player.GetHandScore() < gameplay.dealer.GetHandScore() {
 		gameplay.dealer.Win()
+		gameplay.player.Loose()
+		renderCards(gameplay.dealer)
+		renderCards(gameplay.player)
 		renderDealerWins()
+	} else {
+		gameplay.player.Bet /= 2
+		gameplay.player.Win()
+		renderCards(gameplay.dealer)
+		renderCards(gameplay.player)
+		renderDraw()
+		return
 	}
 }
 // for rendering
 func renderCleanTableWithBettingOptions(gameplay *SinglePlayer){
-	bet, err := strconv.Atoi(read("New Game! Type your bet"))
+	bet, err := strconv.Atoi(read("New Game! Your wallet: "+ strconv.Itoa(gameplay.player.GetWalletAmount()) +". Type your bet"))
 	if err!=nil {
 		renderCleanTableWithBettingOptions(gameplay)
 	} else {
@@ -202,8 +229,8 @@ func renderCleanTableWithBettingOptions(gameplay *SinglePlayer){
 }
 
 func renderDeal(gameplay *SinglePlayer){
-	deal := read("You want to deal? (Y/N)")
-	if deal == "Y"{
+	deal := read("You want to deal? (y/n)")
+	if deal == "y"{
 		gameplay.Deal()
 	} else {
 		renderDeal(gameplay)
@@ -211,14 +238,15 @@ func renderDeal(gameplay *SinglePlayer){
 }
 
 func renderHitOrStand(gameplay *SinglePlayer){
-	fmt.Printf("\n You: %d \n Dealer %d \n", gameplay.player.GetHandScores(), gameplay.dealer.GetHandScores())
-	action := read("HIT (H) / STAND (S)")
-	if action == "H" {
+	renderCards(gameplay.dealer)
+	renderCards(gameplay.player)
+	action := read("HIT (h) / STAND (s)")
+	if action == "h" {
 		err := gameplay.Hit()
 		if err != nil {
 			fmt.Println(err)
 		}
-	} else if action == "S" {
+	} else if action == "s" {
 		err := gameplay.Stand()
 		if err != nil {
 			fmt.Println(err)
@@ -229,16 +257,11 @@ func renderHitOrStand(gameplay *SinglePlayer){
 }
 
 func renderPlayerCardAdded(card *deck.Card, playerSums []int){
-	println("Player card added: "+ card.GetDisplayingValue())
-	fmt.Printf("player sums: %d \n", playerSums)
 	// todo: render card added for player
 	// todo: render hand sums for player
 }
 
 func renderDealerCardAdded(card *deck.Card, dealerSums []int){
-	println("Dealer card added: "+ card.GetDisplayingValue())
-	fmt.Printf("dealer sums: %d \n", dealerSums)
-
 	// todo: render card added for dealer
 	// todo: render hand sums for dealer
 }
@@ -248,7 +271,7 @@ func renderPlayerBusted(){
 	// todo: render busted
 }
 
-func renderPlayerWins(gameplay *SinglePlayer){
+func renderPlayerWins(){
 	println("Player wins!")
 	// todo: render player wins
 }
@@ -268,4 +291,18 @@ func read(label string) string{
 	fmt.Print(label + ": ")
 	text, _ := reader.ReadString('\n')
 	return strings.Trim(text, "\n\r")
+}
+
+// not needed in real renderer
+func renderCards(player player.Player){
+	cards := player.GetCards()
+	displayingValues := ""
+	for _, card := range cards {
+		if !card.IsVisible {
+			displayingValues += " ? "
+		} else {
+			displayingValues += " " + card.GetDisplayingValue() + " "
+		}
+	}
+	fmt.Printf("%T cards: %s Sum: %d \n", player, displayingValues, player.GetHandScores())
 }
