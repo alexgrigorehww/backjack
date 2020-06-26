@@ -57,7 +57,7 @@ func (h *Hand) DisplayValues() []int {
 	switch {
 	case s+aces+10 == 21 || s+aces == 21:
 		scores = append(scores, 21)
-	case s+aces+10 < 21 && s+aces < 21:
+	case s+aces+10 < 21 && s+aces < 21 && aces != 0:
 		scores = append(scores, s+aces, s+aces+10)
 	default:
 		scores = append(scores, s+aces)

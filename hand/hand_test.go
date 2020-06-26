@@ -88,4 +88,13 @@ func TestHand_DisplayValues(t *testing.T) {
 	if h.DisplayValues()[0] != 3 {
 		t.Error("This should be 3.", h.DisplayValues())
 	}
+	//case: 2+3. At some point returned both sMin and sMax even though there are no aces
+	h = hand.Hand{}
+	c1.SetCard(2, "spades", '♠')
+	h.AddCardToHand(&c1)
+	c2.SetCard(3, "spades", '♠')
+	h.AddCardToHand(&c2)
+	if h.DisplayValues()[0] != 5 {
+		t.Error("This should be 5.", h.DisplayValues())
+	}
 }
