@@ -45,12 +45,14 @@ func (h *Hand) DisplayValues() []int {
 	var scores []int
 	aces = 0
 	for i := 0; i < len(h.cards); i++ {
-		//ignore aces
-		if h.cards[i].GetBlackjackValue() == 1 {
-			aces++ //treat aces separately
-			continue
+		if h.cards[i].IsVisible {
+			//ignore aces
+			if h.cards[i].GetBlackjackValue() == 1 {
+				aces++ //treat aces separately
+				continue
+			}
+			s += h.cards[i].GetBlackjackValue()
 		}
-		s += h.cards[i].GetBlackjackValue()
 	}
 	//sMin=s+aces
 	//sMax=s+aces+10

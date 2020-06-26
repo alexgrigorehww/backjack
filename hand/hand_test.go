@@ -49,7 +49,9 @@ func TestHand_DisplayValues(t *testing.T) {
 
 	//case: bj
 	c1.SetCard(10, "spades", '♠')
+	c1.IsVisible = true
 	c2.SetCard(1, "spades", '♠')
+	c2.IsVisible = true
 	h.AddCardToHand(&c1)
 	h.AddCardToHand(&c2)
 	if h.DisplayValues()[0] != 21 {
@@ -65,6 +67,7 @@ func TestHand_DisplayValues(t *testing.T) {
 	//case: 3 aces
 	h = hand.Hand{}
 	c1.SetCard(1, "spades", '♠')
+	c1.IsVisible = true
 	h.AddCardToHand(&c1)
 	h.AddCardToHand(&c1)
 	h.AddCardToHand(&c1)
@@ -74,6 +77,7 @@ func TestHand_DisplayValues(t *testing.T) {
 
 	//case: 2 values returned
 	c2.SetCard(7, "spades", '♠')
+	c2.IsVisible = true
 	h.AddCardToHand(&c2)
 	if h.DisplayValues()[0] != 10 && h.DisplayValues()[1] != 20 {
 		t.Error("sMion should be 10 and sMax should be 20", h.DisplayValues())
@@ -82,6 +86,7 @@ func TestHand_DisplayValues(t *testing.T) {
 	//case: 3 aces
 	h = hand.Hand{}
 	c1.SetCard(1, "spades", '♠')
+	c1.IsVisible = true
 	h.AddCardToHand(&c1)
 	h.AddCardToHand(&c1)
 	h.AddCardToHand(&c1)
@@ -91,10 +96,23 @@ func TestHand_DisplayValues(t *testing.T) {
 	//case: 2+3. At some point returned both sMin and sMax even though there are no aces
 	h = hand.Hand{}
 	c1.SetCard(2, "spades", '♠')
+	c1.IsVisible = true
 	h.AddCardToHand(&c1)
 	c2.SetCard(3, "spades", '♠')
+	c2.IsVisible = true
 	h.AddCardToHand(&c2)
 	if h.DisplayValues()[0] != 5 {
 		t.Error("This should be 5.", h.DisplayValues())
+	}
+	//case: Hidden card
+	h = hand.Hand{}
+	c1.SetCard(2, "spades", '♠')
+	h.AddCardToHand(&c1)
+	c2.IsVisible = true
+	c2.SetCard(3, "spades", '♠')
+	c2.IsVisible = false
+	h.AddCardToHand(&c2)
+	if h.DisplayValues()[0] != 2 {
+		t.Error("This should be 2.", h.DisplayValues())
 	}
 }
