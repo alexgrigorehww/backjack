@@ -24,12 +24,12 @@ func TestRegularPlayer_Win(t *testing.T) {
 	if score != 1 {
 		t.Errorf("The regularPlayer score should be %d after winning", 1)
 	}
-	if regularPlayer.GetWalletAmount() != initAmount + bet{
+	if regularPlayer.GetWalletAmount() != initAmount+bet {
 		t.Errorf("The regularPlayer wallet amount should be %d after winning", bet)
 	}
 }
 
-func TestRegularPlayer_Loose(t *testing.T){
+func TestRegularPlayer_Loose(t *testing.T) {
 	bet := 10
 	var regularPlayer player.RegularPlayer
 	regularPlayer.Init()
@@ -37,29 +37,29 @@ func TestRegularPlayer_Loose(t *testing.T){
 	regularPlayer.Bet = bet
 	regularPlayer.Loose()
 	score := regularPlayer.GetScore()
-	if score != - 1 {
-		t.Errorf("The regularPlayer score should be %d after winning", - 1)
+	if score != -1 {
+		t.Errorf("The regularPlayer score should be %d after winning", -1)
 	}
-	if regularPlayer.GetWalletAmount() != initAmount -bet{
+	if regularPlayer.GetWalletAmount() != initAmount-bet {
 		t.Errorf("The regularPlayer wallet amount should be %d after winning", -bet)
 	}
 }
 
-func TestRegularPlayer_DrawCard(t *testing.T){
+func TestRegularPlayer_DrawCard(t *testing.T) {
 	var deck deck.Deck
 	deck.Init()
 	var regularPlayer player.RegularPlayer
 	regularPlayer.Init()
 	regularPlayer.DrawCard(&deck)
-	if len(regularPlayer.GetCards()) != 1{
+	if len(regularPlayer.GetCards()) != 1 {
 		t.Error("regularPlayer should have 1 card")
 	}
 	regularPlayer.DrawCard(&deck)
-	if len(regularPlayer.GetCards()) != 2{
+	if len(regularPlayer.GetCards()) != 2 {
 		t.Error("regularPlayer should have 2 cards")
 	}
 	regularPlayer.DrawCard(&deck)
-	if len(regularPlayer.GetCards()) != 3{
+	if len(regularPlayer.GetCards()) != 3 {
 		t.Error("regularPlayer should have 3 cards")
 	}
 	if deck.CardsLeft() != 49 {

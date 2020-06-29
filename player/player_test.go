@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestPlayer_Dealer(t *testing.T){
+func TestPlayer_Dealer(t *testing.T) {
 	var dealer player.Dealer
 	var player player.Player
 	dealer.Init()
@@ -16,7 +16,7 @@ func TestPlayer_Dealer(t *testing.T){
 	}
 }
 
-func TestPlayer_RegularPlayer(t *testing.T){
+func TestPlayer_RegularPlayer(t *testing.T) {
 	var regularPlayer player.RegularPlayer
 	var player player.Player
 	regularPlayer.Init()

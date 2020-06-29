@@ -1,22 +1,24 @@
 package main
 
 import (
-	"image"
-	"image/color"
+	"github.com/golang/freetype/truetype"
+	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/text"
 	"golang.org/x/image/colornames"
-	"log"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/gofont/goregular"
-	"github.com/golang/freetype/truetype"
-	"github.com/hajimehoshi/ebiten/text"
-	"github.com/hajimehoshi/ebiten"
+	"image"
+	"image/color"
+	"log"
 )
+
 var (
-	fontNumberCard      font.Face
-	fontSignCard        font.Face
-	fontNrMHeight   int
+	fontNumberCard font.Face
+	fontSignCard   font.Face
+	fontNrMHeight  int
 	fontSMHeight   int
 )
+
 func init() {
 	tt, err := truetype.Parse(goregular.TTF)
 	if err != nil {
@@ -41,16 +43,16 @@ func init() {
 }
 
 type Card struct {
-	Rect  image.Rectangle
-	Number  string
-	Sign  string
-	Color color.RGBA
+	Rect   image.Rectangle
+	Number string
+	Sign   string
+	Color  color.RGBA
 }
 
 func (c *Card) Draw(dst *ebiten.Image) {
 	cardColorBg := color.RGBA{0xff, 0xff, 0xff, 0xff}
 	cardColor := colornames.Black
-	if(c.Sign == "♦" || c.Sign == "♥"){
+	if c.Sign == "♦" || c.Sign == "♥" {
 		cardColor = colornames.Red
 	}
 	drawNinePatches(dst, c.Rect, imageSrcRects[imageTypeButton], cardColorBg)

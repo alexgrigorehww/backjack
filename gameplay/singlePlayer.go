@@ -3,34 +3,33 @@ package gameplay
 import (
 	"blackjack/deck"
 	"blackjack/player"
-	"bufio"
+	"blackjack/ui"
 	"errors"
-	"fmt"
-	"os"
-	"strconv"
-	"strings"
 )
 
-const(
-	nextStepInit   = ""
-	nextStepSetBet = "SET_BET"
-	nextStepDeal   = "DEAL"
+const (
+	nextStepInit       = ""
+	nextStepSetBet     = "SET_BET"
+	nextStepDeal       = "DEAL"
 	nextStepHitOrStand = "HIT_OR_STAND"
-	nextStepNewGame = "NEW_GAME"
+	nextStepNewGame    = "NEW_GAME"
 )
 
 type SinglePlayer struct {
 	whatsNext string
-	dealer *player.Dealer
-	player *player.RegularPlayer
-	deck *deck.Deck
+	dealer    *player.Dealer
+	player    *player.RegularPlayer
+	deck      *deck.Deck
+	consoleUi *ui.ConsoleUi
 }
 
-func (gameplay *SinglePlayer) Init() (err error){
+func (gameplay *SinglePlayer) Init() (err error) {
 	if gameplay.whatsNext != nextStepInit {
 		err = errors.New("invalid gameplay state. cannot initialize the game")
 		return
 	}
+	consoleUi := new(ui.ConsoleUi)
+
 	theDeck := new(deck.Deck)
 	theDeck.Init()
 	theDeck.Shuffle(deck.ShuffleAndMixAll)
@@ -38,10 +37,11 @@ func (gameplay *SinglePlayer) Init() (err error){
 	dealer := new(player.Dealer)
 	dealer.Init()
 
-	// for the moment only one player
-	// in future we may add players from UI (join style)
 	player := new(player.RegularPlayer)
 	player.Init()
+
+	// init UI
+	gameplay.consoleUi = consoleUi
 
 	// init gameplay
 	gameplay.deck = theDeck
@@ -49,11 +49,12 @@ func (gameplay *SinglePlayer) Init() (err error){
 	gameplay.player = player
 
 	gameplay.whatsNext = nextStepSetBet
-	renderCleanTableWithBettingOptions(gameplay)
+	walletAmount := gameplay.player.GetWalletAmount()
+	gameplay.consoleUi.RenderCleanTableWithBettingOptions(gameplay.SetBet, walletAmount)
 	return
 }
 
-func (gameplay *SinglePlayer) SetBet(bet int) (err error){
+func (gameplay *SinglePlayer) SetBet(bet int) (err error) {
 	if gameplay.whatsNext != nextStepSetBet {
 		err = errors.New("invalid gameplay state. you cannot set bet")
 		return
@@ -63,12 +64,12 @@ func (gameplay *SinglePlayer) SetBet(bet int) (err error){
 		return
 	}
 	gameplay.player.Bet = bet
-	renderDeal(gameplay)
+	ui.RenderDeal(gameplay.Deal)
 	gameplay.whatsNext = nextStepDeal
 	return
 }
 
-func (gameplay *SinglePlayer) Deal() (err error){
+func (gameplay *SinglePlayer) Deal() (err error) {
 	if gameplay.whatsNext != nextStepSetBet {
 		err = errors.New("invalid gameplay state. you cannot deal")
 		return
@@ -79,24 +80,23 @@ func (gameplay *SinglePlayer) Deal() (err error){
 	dealerDrawCard(gameplay)
 
 	gameplay.whatsNext = nextStepHitOrStand
-	renderHitOrStand(gameplay)
+	gameplay.consoleUi.RenderHitOrStand(gameplay.Hit, gameplay.Stand)
 	return
 }
 
-func (gameplay *SinglePlayer) Hit() (err error){
+func (gameplay *SinglePlayer) Hit() (err error) {
 	if gameplay.whatsNext != nextStepHitOrStand {
 		err = errors.New("invalid gameplay state. you cannot hit")
 		return
 	}
 	shouldStop := playerDrawCard(gameplay)
-
 	if !shouldStop {
-		renderHitOrStand(gameplay)
+		gameplay.consoleUi.RenderHitOrStand(gameplay.Hit, gameplay.Stand)
 	}
 	return
 }
 
-func (gameplay *SinglePlayer) Stand() (err error){
+func (gameplay *SinglePlayer) Stand() (err error) {
 	if gameplay.whatsNext != nextStepHitOrStand {
 		err = errors.New("invalid gameplay state. you cannot stand")
 		return
@@ -117,7 +117,7 @@ func (gameplay *SinglePlayer) Stand() (err error){
 	return
 }
 
-func (gameplay *SinglePlayer) NewGame() (err error){
+func (gameplay *SinglePlayer) NewGame() (err error) {
 	if gameplay.whatsNext != nextStepNewGame {
 		err = errors.New("invalid gameplay state. you cannot start new game")
 		return
@@ -125,40 +125,39 @@ func (gameplay *SinglePlayer) NewGame() (err error){
 	gameplay.dealer.DiscardAllCards(gameplay.deck)
 	gameplay.player.DiscardAllCards(gameplay.deck)
 	gameplay.whatsNext = nextStepSetBet
-	renderCleanTableWithBettingOptions(gameplay)
+	walletAmount := gameplay.player.GetWalletAmount()
+	gameplay.consoleUi.RenderCleanTableWithBettingOptions(gameplay.SetBet, walletAmount)
 	return
 }
 
-func playerDrawCard(gameplay *SinglePlayer) bool{
+func playerDrawCard(gameplay *SinglePlayer) bool {
 	card := gameplay.player.DrawCard(gameplay.deck)
 	scores := gameplay.player.GetHandScores()
-	renderPlayerCardAdded(card, scores)
+	gameplay.consoleUi.AddPlayerCard(card, scores)
 
-	if gameplay.player.IsBusted(){
+	if gameplay.player.IsBusted() {
 		gameplay.player.Loose()
 		gameplay.whatsNext = nextStepNewGame
-		renderCards(gameplay.dealer)
-		renderCards(gameplay.player)
-		renderPlayerBusted()
+		gameplay.dealer.RevealSecondCard()
+		gameplay.consoleUi.RenderDealerCards(nil)
+		gameplay.consoleUi.RenderPlayerCards()
+		ui.RenderPlayerBusted()
 		gameplay.NewGame()
 		return true
 	}
-	if gameplay.player.IsBlackjack(){
+	if gameplay.player.IsBlackjack() {
 		gameplay.Stand()
 		return true
 	}
 	return false
 }
 
-func dealerDrawCard(gameplay *SinglePlayer) bool{
+func dealerDrawCard(gameplay *SinglePlayer) bool {
 	card := gameplay.dealer.DrawCard(gameplay.deck)
 	scores := gameplay.dealer.GetHandScores()
-	renderDealerCardAdded(card, scores)
-	if gameplay.dealer.IsBusted(){
-		gameplay.player.Win()
-		renderCards(gameplay.dealer)
-		renderCards(gameplay.player)
-		renderPlayerWins()
+	gameplay.consoleUi.AddDealerCard(card, scores)
+	if gameplay.dealer.IsBusted() {
+		gameplay.performPlayerWins()
 		gameplay.whatsNext = nextStepNewGame
 		gameplay.NewGame()
 		return true
@@ -170,139 +169,54 @@ func (gameplay *SinglePlayer) evaluate() {
 	dealerBlackjack := gameplay.dealer.IsBlackjack()
 	playerBlackjack := gameplay.player.IsBlackjack()
 
-	if dealerBlackjack && playerBlackjack{
-		gameplay.player.Bet /= 2
-		gameplay.player.Win()
-		renderCards(gameplay.dealer)
-		renderCards(gameplay.player)
-		renderDraw()
+	if dealerBlackjack && playerBlackjack {
+		gameplay.performDraw()
 		return
 	}
-	if dealerBlackjack{
-		gameplay.dealer.Win()
-		gameplay.player.Loose()
-		renderCards(gameplay.dealer)
-		renderCards(gameplay.player)
-		renderDealerWins()
+	if dealerBlackjack {
+		gameplay.performDealerWins()
 		return
 	}
-	if playerBlackjack{
-		gameplay.player.Win()
-		renderCards(gameplay.dealer)
-		renderCards(gameplay.player)
-		renderPlayerWins()
+	if playerBlackjack {
+		gameplay.performPlayerWins()
 		return
 	}
-	println(gameplay.player.GetHandScore())
-	println(gameplay.dealer.GetHandScore())
 	if gameplay.player.GetHandScore() > gameplay.dealer.GetHandScore() {
-		gameplay.player.Win()
-		renderCards(gameplay.dealer)
-		renderCards(gameplay.player)
-		renderPlayerWins()
+		gameplay.performPlayerWins()
 	} else if gameplay.player.GetHandScore() < gameplay.dealer.GetHandScore() {
-		gameplay.dealer.Win()
-		gameplay.player.Loose()
-		renderCards(gameplay.dealer)
-		renderCards(gameplay.player)
-		renderDealerWins()
+		gameplay.performDealerWins()
 	} else {
-		gameplay.player.Bet /= 2
-		gameplay.player.Win()
-		renderCards(gameplay.dealer)
-		renderCards(gameplay.player)
-		renderDraw()
+		gameplay.performDraw()
 		return
 	}
 }
-// for rendering
-func renderCleanTableWithBettingOptions(gameplay *SinglePlayer){
-	bet, err := strconv.Atoi(read("New Game! Your wallet: "+ strconv.Itoa(gameplay.player.GetWalletAmount()) +". Type your bet"))
-	if err!=nil {
-		renderCleanTableWithBettingOptions(gameplay)
-	} else {
-		err := gameplay.SetBet(bet)
-		if err != nil{
-			fmt.Println(err)
-		}
-	}
+
+func (gameplay *SinglePlayer) performPlayerWins() {
+	gameplay.player.Win()
+	gameplay.dealer.RevealSecondCard()
+	allDealerHandSum := gameplay.dealer.GetHandScores()
+	gameplay.consoleUi.RenderDealerCards(allDealerHandSum)
+	gameplay.consoleUi.RenderPlayerCards()
+	ui.RenderPlayerWins()
 }
 
-func renderDeal(gameplay *SinglePlayer){
-	deal := read("You want to deal? (y/n)")
-	if deal == "y"{
-		gameplay.Deal()
-	} else {
-		renderDeal(gameplay)
-	}
+func (gameplay *SinglePlayer) performDealerWins() {
+	gameplay.dealer.Win()
+	gameplay.player.Loose()
+	gameplay.dealer.RevealSecondCard()
+	allDealerHandSum := gameplay.dealer.GetHandScores()
+	gameplay.consoleUi.RenderDealerCards(allDealerHandSum)
+	gameplay.consoleUi.RenderPlayerCards()
+	ui.RenderDealerWins()
 }
 
-func renderHitOrStand(gameplay *SinglePlayer){
-	renderCards(gameplay.dealer)
-	renderCards(gameplay.player)
-	action := read("HIT (h) / STAND (s)")
-	if action == "h" {
-		err := gameplay.Hit()
-		if err != nil {
-			fmt.Println(err)
-		}
-	} else if action == "s" {
-		err := gameplay.Stand()
-		if err != nil {
-			fmt.Println(err)
-		}
-	} else {
-		renderHitOrStand(gameplay)
-	}
-}
-
-func renderPlayerCardAdded(card *deck.Card, playerSums []int){
-	// todo: render card added for player
-	// todo: render hand sums for player
-}
-
-func renderDealerCardAdded(card *deck.Card, dealerSums []int){
-	// todo: render card added for dealer
-	// todo: render hand sums for dealer
-}
-
-func renderPlayerBusted(){
-	println("Player busted")
-	// todo: render busted
-}
-
-func renderPlayerWins(){
-	println("Player wins!")
-	// todo: render player wins
-}
-
-func renderDraw(){
-	println("DRAW")
-	// todo: render draw
-}
-
-func renderDealerWins(){
-	println("Dealer wins")
-	// todo: render dealer wins
-}
-
-func read(label string) string{
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print(label + ": ")
-	text, _ := reader.ReadString('\n')
-	return strings.Trim(text, "\n\r")
-}
-
-// not needed in real renderer
-func renderCards(player player.Player){
-	cards := player.GetCards()
-	displayingValues := ""
-	for _, card := range cards {
-		if !card.IsVisible {
-			displayingValues += " ? "
-		} else {
-			displayingValues += " " + card.GetDisplayingValue() + " "
-		}
-	}
-	fmt.Printf("%T cards: %s Sum: %d \n", player, displayingValues, player.GetHandScores())
+func (gameplay *SinglePlayer) performDraw() {
+	gameplay.player.Bet /= 2
+	gameplay.player.Win()
+	gameplay.dealer.Win()
+	gameplay.dealer.RevealSecondCard()
+	allDealerHandSum := gameplay.dealer.GetHandScores()
+	gameplay.consoleUi.RenderDealerCards(allDealerHandSum)
+	gameplay.consoleUi.RenderPlayerCards()
+	ui.RenderDraw()
 }

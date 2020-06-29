@@ -2,16 +2,16 @@ package main
 
 import (
 	"bytes"
+	"github.com/golang/freetype/truetype"
+	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/examples/resources/images"
+	"github.com/hajimehoshi/ebiten/text"
+	"golang.org/x/image/font"
+	"golang.org/x/image/font/gofont/goregular"
 	"image"
 	"image/color"
 	_ "image/png"
-	"golang.org/x/image/font"
-	"golang.org/x/image/font/gofont/goregular"
-	"github.com/golang/freetype/truetype"
-	"github.com/hajimehoshi/ebiten"
-	"github.com/hajimehoshi/ebiten/text"
 	"log"
-	"github.com/hajimehoshi/ebiten/examples/resources/images"
 )
 
 type imageType int
@@ -67,14 +67,14 @@ func init() {
 		Size:    12,
 		DPI:     72,
 		Hinting: font.HintingFull,
-	});
+	})
 	b, _, _ := uiFont.GlyphBounds('M')
 	uiFontMHeight = (b.Max.Y - b.Min.Y).Ceil()
 }
 
 type Button struct {
-	Rect image.Rectangle
-	Text string
+	Rect  image.Rectangle
+	Text  string
 	Color color.RGBA
 
 	mouseDown bool
@@ -174,7 +174,7 @@ func drawNinePatches(dst *ebiten.Image, dstRect image.Rectangle, srcRect image.R
 			im := image.Rect(sx, sy, sx+sw, sy+sh)
 			//im.Set(2, 3, color.RGBA{255, 0, 0, 255})
 			img := uiImage.SubImage(im).(*ebiten.Image)
-		//	img.Set(0, 0, clr)
+			//	img.Set(0, 0, clr)
 
 			dst.DrawImage(img, op)
 		}

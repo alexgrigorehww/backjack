@@ -32,7 +32,7 @@ func (d *Deck) Init() {
 	}
 }
 
-func (d *Deck) Shuffle(shuffleType ShuffleType){
+func (d *Deck) Shuffle(shuffleType ShuffleType) {
 	rand.Seed(time.Now().UnixNano())
 	var whatToShuffle []*Card
 	switch shuffleType {
@@ -50,7 +50,7 @@ func (d *Deck) Shuffle(shuffleType ShuffleType){
 	})
 }
 
-func (d *Deck) Draw() *Card{
+func (d *Deck) Draw() *Card {
 	if len(d.cards) == 0 {
 		d.Shuffle(ShuffleAndMixAll)
 	}
@@ -59,23 +59,23 @@ func (d *Deck) Draw() *Card{
 	return card
 }
 
-func (d *Deck) Discard(cards []*Card){
-	for _, card := range cards{
+func (d *Deck) Discard(cards []*Card) {
+	for _, card := range cards {
 		card.IsVisible = false
 	}
 	d.discarded = append(d.discarded, cards...)
 }
 
-func (d *Deck) DiscardOne(card *Card){
+func (d *Deck) DiscardOne(card *Card) {
 	card.IsVisible = false
 	d.discarded = append(d.discarded, card)
 }
 
-func (d *Deck) CardsLeft() int{
+func (d *Deck) CardsLeft() int {
 	return len(d.cards)
 }
 
-func (d *Deck) GetDiscarded() []*Card{
+func (d *Deck) GetDiscarded() []*Card {
 	return d.discarded
 }
 

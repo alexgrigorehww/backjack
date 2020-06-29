@@ -31,7 +31,7 @@ func TestCard_GetDisplayingValue(t *testing.T) {
 
 func TestCard_GetSymbol(t *testing.T) {
 	var card deck.Card
-	card.SetCard(1,"", 'S')
+	card.SetCard(1, "", 'S')
 	if card.GetSymbol() != "S" {
 		t.Error("Card symbol S should be displayed as string S")
 	}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"blackjack/deck"
+	"blackjack/gameplay"
 	"blackjack/wallet"
 	"fmt"
 	"github.com/hajimehoshi/ebiten"
@@ -97,7 +98,7 @@ func update(screen *ebiten.Image) error {
 		return nil
 	}
 
-//	bustText.Draw(screen, "Black Jack!", startX+75/2, startY+125/2)
+	//	bustText.Draw(screen, "Black Jack!", startX+75/2, startY+125/2)
 	// Fill background
 	screen.Fill(color.RGBA{0xeb, 0xeb, 0xeb, 0xff})
 
@@ -120,7 +121,7 @@ func update(screen *ebiten.Image) error {
 	return nil
 }
 
-func renderCards(screen *ebiten.Image, cards []drawnCard, startX int, startY int) int{
+func renderCards(screen *ebiten.Image, cards []drawnCard, startX int, startY int) int {
 	cardsSum := 0
 	for uk, card := range cards {
 		if card.IsHidden {
@@ -145,17 +146,19 @@ func renderCards(screen *ebiten.Image, cards []drawnCard, startX int, startY int
 }
 
 func renderEndGame(screen *ebiten.Image, cardsSum int, startX int, startY int) {
-	if (cardsSum > 21) {
+	if cardsSum > 21 {
 		//render BUST
 		bustText.Draw(screen, "BUST", startX+75/2, startY+125/2)
 	}
-	if (cardsSum == 21) {
+	if cardsSum == 21 {
 		//render BUST
 		bustText.Draw(screen, "Black Jack!", startX+75/2, startY+125/2)
 	}
 }
 
 func main() {
+	gameplay := new(gameplay.SinglePlayer)
+	gameplay.Init()
 	if err := ebiten.Run(update, screenWidth, screenHeight, 1, "BlackJack"); err != nil {
 		log.Fatal(err)
 	}

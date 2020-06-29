@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
+	"github.com/golang/freetype/truetype"
+	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/text"
+	"golang.org/x/image/font"
+	"golang.org/x/image/font/gofont/goregular"
 	"image/color"
 	"log"
-	"golang.org/x/image/font"
-	"github.com/golang/freetype/truetype"
-	"golang.org/x/image/font/gofont/goregular"
-	"github.com/hajimehoshi/ebiten/text"
-	"github.com/hajimehoshi/ebiten"
 )
 
 var (
@@ -33,5 +33,5 @@ type SumCards struct {
 
 func (s *SumCards) Draw(dst *ebiten.Image, sumCards int, startX int, startY int) {
 	nrStr := fmt.Sprintf("%2d", sumCards)
-	text.Draw(dst, nrStr, sumCardsFont, startX - len(nrStr)*s.fontSize, startY + s.fontSize, color.Black)
+	text.Draw(dst, nrStr, sumCardsFont, startX-len(nrStr)*s.fontSize, startY+s.fontSize, color.Black)
 }

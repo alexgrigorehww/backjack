@@ -25,31 +25,31 @@ func TestDealer_Win(t *testing.T) {
 	}
 }
 
-func TestDealer_Loose(t *testing.T){
+func TestDealer_Loose(t *testing.T) {
 	var dealer player.Dealer
 	dealer.Init()
 	dealer.Loose()
 	score := dealer.GetScore()
-	if score != - 1 {
-		t.Errorf("The dealer score should be %d after winning", - 1)
+	if score != -1 {
+		t.Errorf("The dealer score should be %d after winning", -1)
 	}
 }
 
-func TestDealer_DrawCard(t *testing.T){
+func TestDealer_DrawCard(t *testing.T) {
 	var deck deck.Deck
 	deck.Init()
 	var dealer player.Dealer
 	dealer.Init()
 	dealer.DrawCard(&deck)
-	if len(dealer.GetCards()) != 1{
+	if len(dealer.GetCards()) != 1 {
 		t.Error("Dealer should have 1 card")
 	}
 	dealer.DrawCard(&deck)
-	if len(dealer.GetCards()) != 2{
+	if len(dealer.GetCards()) != 2 {
 		t.Error("Dealer should have 2 cards")
 	}
 	dealer.DrawCard(&deck)
-	if len(dealer.GetCards()) != 3{
+	if len(dealer.GetCards()) != 3 {
 		t.Error("Dealer should have 3 cards")
 	}
 	if deck.CardsLeft() != 49 {

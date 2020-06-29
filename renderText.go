@@ -1,13 +1,13 @@
 package main
 
 import (
+	"github.com/golang/freetype/truetype"
+	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/text"
+	"golang.org/x/image/font"
+	"golang.org/x/image/font/gofont/goregular"
 	"image/color"
 	"log"
-	"golang.org/x/image/font"
-	"github.com/golang/freetype/truetype"
-	"golang.org/x/image/font/gofont/goregular"
-	"github.com/hajimehoshi/ebiten/text"
-	"github.com/hajimehoshi/ebiten"
 )
 
 var (
@@ -28,7 +28,7 @@ func init() {
 
 type RenderText struct {
 	fontSize int
-	color color.RGBA
+	color    color.RGBA
 }
 
 func (s *RenderText) Draw(dst *ebiten.Image, renderText string, startX int, startY int) {
