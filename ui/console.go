@@ -37,12 +37,12 @@ func (consoleUi *ConsoleUi) RenderCleanTableWithBettingOptions(setBet func(int) 
 	}
 }
 
-func RenderDeal(deal func() error) {
+func (consoleUi *ConsoleUi) RenderDeal(deal func() error) {
 	dealRes := read("You want to deal? (y/n)")
 	if dealRes == "y" {
 		deal()
 	} else {
-		RenderDeal(deal)
+		consoleUi.RenderDeal(deal)
 	}
 }
 
@@ -75,20 +75,19 @@ func (consoleUi *ConsoleUi) AddDealerCard(card *deck.Card, dealerSums []int) {
 	consoleUi.dealerSums = dealerSums
 }
 
-func RenderPlayerBusted() {
+func (consoleUi *ConsoleUi) RenderPlayerBusted() {
 	println("Player busted")
-	// todo: render busted
 }
 
-func RenderPlayerWins() {
+func (consoleUi *ConsoleUi) RenderPlayerWins() {
 	println("Player wins!")
 }
 
-func RenderDraw() {
+func (consoleUi *ConsoleUi) RenderDraw() {
 	println("DRAW")
 }
 
-func RenderDealerWins() {
+func (consoleUi *ConsoleUi) RenderDealerWins() {
 	println("Dealer wins")
 }
 
@@ -117,6 +116,10 @@ func (consoleUi *ConsoleUi) RenderPlayerCards() {
 		}
 	}
 	fmt.Printf("Player cards: %s Sum: %d \n", displayingValues, consoleUi.playerSums)
+}
+
+func (consoleUi *ConsoleUi) RenderGameOver() {
+	fmt.Print("Game Over! Your wallet is empty")
 }
 
 func read(label string) string {

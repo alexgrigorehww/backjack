@@ -48,9 +48,9 @@ func (gameplay *SinglePlayer) Init() (err error) {
 	gameplay.dealer = dealer
 	gameplay.player = player
 
-	gameplay.whatsNext = nextStepSetBet
-	walletAmount := gameplay.player.GetWalletAmount()
-	gameplay.consoleUi.RenderCleanTableWithBettingOptions(gameplay.SetBet, walletAmount)
+	gameplay.whatsNext = nextStepNewGame
+	gameplay.NewGame()
+
 	return
 }
 
@@ -64,7 +64,7 @@ func (gameplay *SinglePlayer) SetBet(bet int) (err error) {
 		return
 	}
 	gameplay.player.Bet = bet
-	ui.RenderDeal(gameplay.Deal)
+	gameplay.consoleUi.RenderDeal(gameplay.Deal)
 	gameplay.whatsNext = nextStepDeal
 	return
 }
@@ -122,6 +122,9 @@ func (gameplay *SinglePlayer) NewGame() (err error) {
 		err = errors.New("invalid gameplay state. you cannot start new game")
 		return
 	}
+	if gameplay.player.GetWalletAmount() == 0 {
+		gameplay.consoleUi.RenderGameOver()
+	}
 	gameplay.dealer.DiscardAllCards(gameplay.deck)
 	gameplay.player.DiscardAllCards(gameplay.deck)
 	gameplay.whatsNext = nextStepSetBet
@@ -141,7 +144,7 @@ func playerDrawCard(gameplay *SinglePlayer) bool {
 		gameplay.dealer.RevealSecondCard()
 		gameplay.consoleUi.RenderDealerCards(nil)
 		gameplay.consoleUi.RenderPlayerCards()
-		ui.RenderPlayerBusted()
+		gameplay.consoleUi.RenderPlayerBusted()
 		gameplay.NewGame()
 		return true
 	}
@@ -197,7 +200,7 @@ func (gameplay *SinglePlayer) performPlayerWins() {
 	allDealerHandSum := gameplay.dealer.GetHandScores()
 	gameplay.consoleUi.RenderDealerCards(allDealerHandSum)
 	gameplay.consoleUi.RenderPlayerCards()
-	ui.RenderPlayerWins()
+	gameplay.consoleUi.RenderPlayerWins()
 }
 
 func (gameplay *SinglePlayer) performDealerWins() {
@@ -207,7 +210,7 @@ func (gameplay *SinglePlayer) performDealerWins() {
 	allDealerHandSum := gameplay.dealer.GetHandScores()
 	gameplay.consoleUi.RenderDealerCards(allDealerHandSum)
 	gameplay.consoleUi.RenderPlayerCards()
-	ui.RenderDealerWins()
+	gameplay.consoleUi.RenderDealerWins()
 }
 
 func (gameplay *SinglePlayer) performDraw() {
@@ -218,5 +221,5 @@ func (gameplay *SinglePlayer) performDraw() {
 	allDealerHandSum := gameplay.dealer.GetHandScores()
 	gameplay.consoleUi.RenderDealerCards(allDealerHandSum)
 	gameplay.consoleUi.RenderPlayerCards()
-	ui.RenderDraw()
+	gameplay.consoleUi.RenderDraw()
 }
