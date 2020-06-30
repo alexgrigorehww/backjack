@@ -1,15 +1,29 @@
 package deck
 
-import "strconv"
+import (
+	"encoding/json"
+	"strconv"
+)
 
 type CardType struct {
 	name   string
 	symbol rune
 }
 
+type SerializableCardType struct {
+	Name   string
+	Symbol rune
+}
+
 type Card struct {
 	value     int
 	cardType  *CardType
+	IsVisible bool
+}
+
+type SerializableCard struct {
+	Value     int
+	CardType  *SerializableCardType
 	IsVisible bool
 }
 
@@ -36,6 +50,38 @@ func (c *Card) GetDisplayingValue() string {
 		return "K"
 	default:
 		return strconv.Itoa(c.value)
+	}
+}
+
+func (c *Card) Serialize() (result string, err error) {
+	cardTypeJson := SerializableCardType{
+		Name:   c.cardType.name,
+		Symbol: c.cardType.symbol,
+	}
+	cardJson := SerializableCard{
+		Value:     c.value,
+		CardType:  &cardTypeJson,
+		IsVisible: c.IsVisible,
+	}
+	b, err := json.Marshal(cardJson)
+	if err != nil {
+		return
+	}
+	result = string(b)
+	return
+}
+
+func DeserializeCard(s string) Card {
+	serializableCard := new(SerializableCard)
+	b := []byte(s)
+	json.Unmarshal(b, &serializableCard)
+	return Card{
+		value:     serializableCard.Value,
+		cardType:  &CardType{
+			name:   serializableCard.CardType.Name,
+			symbol: serializableCard.CardType.Symbol,
+		},
+		IsVisible: serializableCard.IsVisible,
 	}
 }
 

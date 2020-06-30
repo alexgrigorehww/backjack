@@ -5,6 +5,8 @@ import (
 	"testing"
 )
 
+const mockedSerialization = "{\"Value\":10,\"CardType\":{\"Name\":\"\",\"Symbol\":32},\"IsVisible\":false}"
+
 func TestCard_GetDisplayingValue(t *testing.T) {
 	var card1, card2, card3, card4, card5 deck.Card
 	card1.SetCard(10, "", ' ')
@@ -33,7 +35,7 @@ func TestCard_GetSymbol(t *testing.T) {
 	var card deck.Card
 	card.SetCard(1, "", 'S')
 	if card.GetSymbol() != "S" {
-		t.Error("Card symbol S should be displayed as string S")
+		t.Error("Card Symbol S should be displayed as string S")
 	}
 }
 
@@ -50,5 +52,27 @@ func TestCard_GetBlackjackValue(t *testing.T) {
 	card3.SetCard(14, "", ' ')
 	if card3.GetBlackjackValue() != 10 {
 		t.Error("14 should be 10")
+	}
+}
+
+func TestCard_Serialize(t *testing.T) {
+	var card deck.Card
+	card.SetCard(10, "", ' ')
+	serialized, _ := card.Serialize()
+	if serialized != mockedSerialization {
+		t.Error("wrong serialization")
+	}
+}
+
+func TestCard_Deserialize(t *testing.T) {
+	card := deck.DeserializeCard(mockedSerialization)
+	if card.IsVisible != false {
+		t.Error("wrong visibility")
+	}
+	if card.GetDisplayingValue() != "10" {
+		t.Error("wrong value")
+	}
+	if card.GetSymbol() != string(' ') {
+		t.Error("wrong symbol")
 	}
 }

@@ -19,7 +19,7 @@ func checkExpectedCard(i int, card Card) (expectedValue int, ok bool) {
 func TestDeck_Init(t *testing.T) {
 	var deck Deck
 	deck.Init()
-	// check cards value
+	// check cards Value
 	for i, card := range deck.cards {
 		expectedValue, ok := checkExpectedCard(i, *card)
 		if !ok {
