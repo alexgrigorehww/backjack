@@ -20,15 +20,14 @@ type SinglePlayer struct {
 	dealer    *player.Dealer
 	player    *player.RegularPlayer
 	deck      *deck.Deck
-	consoleUi *ui.ConsoleUi
+	ui        ui.UI
 }
 
-func (gameplay *SinglePlayer) Init() (err error) {
+func (gameplay *SinglePlayer) Init(ui *ui.UI) (err error) {
 	if gameplay.whatsNext != nextStepInit {
 		err = errors.New("invalid gameplay state. cannot initialize the game")
 		return
 	}
-	consoleUi := new(ui.ConsoleUi)
 
 	theDeck := new(deck.Deck)
 	theDeck.Init()
@@ -41,7 +40,7 @@ func (gameplay *SinglePlayer) Init() (err error) {
 	player.Init()
 
 	// init UI
-	gameplay.consoleUi = consoleUi
+	gameplay.ui = *ui
 
 	// init gameplay
 	gameplay.deck = theDeck
@@ -64,7 +63,7 @@ func (gameplay *SinglePlayer) SetBet(bet int) (err error) {
 		return
 	}
 	gameplay.player.Bet = bet
-	gameplay.consoleUi.RenderDeal(gameplay.Deal)
+	gameplay.ui.RenderDeal(gameplay.Deal)
 	gameplay.whatsNext = nextStepDeal
 	return
 }
@@ -80,7 +79,7 @@ func (gameplay *SinglePlayer) Deal() (err error) {
 	dealerDrawCard(gameplay)
 
 	gameplay.whatsNext = nextStepHitOrStand
-	gameplay.consoleUi.RenderHitOrStand(gameplay.Hit, gameplay.Stand)
+	gameplay.ui.RenderHitOrStand(gameplay.Hit, gameplay.Stand)
 	return
 }
 
@@ -91,7 +90,7 @@ func (gameplay *SinglePlayer) Hit() (err error) {
 	}
 	shouldStop := playerDrawCard(gameplay)
 	if !shouldStop {
-		gameplay.consoleUi.RenderHitOrStand(gameplay.Hit, gameplay.Stand)
+		gameplay.ui.RenderHitOrStand(gameplay.Hit, gameplay.Stand)
 	}
 	return
 }
@@ -123,28 +122,29 @@ func (gameplay *SinglePlayer) NewGame() (err error) {
 		return
 	}
 	if gameplay.player.GetWalletAmount() == 0 {
-		gameplay.consoleUi.RenderGameOver()
+		gameplay.ui.RenderGameOver()
+		return
 	}
 	gameplay.dealer.DiscardAllCards(gameplay.deck)
 	gameplay.player.DiscardAllCards(gameplay.deck)
 	gameplay.whatsNext = nextStepSetBet
 	walletAmount := gameplay.player.GetWalletAmount()
-	gameplay.consoleUi.RenderCleanTableWithBettingOptions(gameplay.SetBet, walletAmount)
+	gameplay.ui.RenderCleanTableWithBettingOptions(gameplay.SetBet, walletAmount)
 	return
 }
 
 func playerDrawCard(gameplay *SinglePlayer) bool {
 	card := gameplay.player.DrawCard(gameplay.deck)
 	scores := gameplay.player.GetHandScores()
-	gameplay.consoleUi.AddPlayerCard(card, scores)
+	gameplay.ui.AddPlayerCard(card, scores)
 
 	if gameplay.player.IsBusted() {
 		gameplay.player.Loose()
 		gameplay.whatsNext = nextStepNewGame
 		gameplay.dealer.RevealSecondCard()
-		gameplay.consoleUi.RenderDealerCards(nil)
-		gameplay.consoleUi.RenderPlayerCards()
-		gameplay.consoleUi.RenderPlayerBusted()
+		gameplay.ui.RenderDealerCards(nil)
+		gameplay.ui.RenderPlayerCards()
+		gameplay.ui.RenderPlayerBusted()
 		gameplay.NewGame()
 		return true
 	}
@@ -158,7 +158,7 @@ func playerDrawCard(gameplay *SinglePlayer) bool {
 func dealerDrawCard(gameplay *SinglePlayer) bool {
 	card := gameplay.dealer.DrawCard(gameplay.deck)
 	scores := gameplay.dealer.GetHandScores()
-	gameplay.consoleUi.AddDealerCard(card, scores)
+	gameplay.ui.AddDealerCard(card, scores)
 	if gameplay.dealer.IsBusted() {
 		gameplay.performPlayerWins()
 		gameplay.whatsNext = nextStepNewGame
@@ -198,9 +198,9 @@ func (gameplay *SinglePlayer) performPlayerWins() {
 	gameplay.player.Win()
 	gameplay.dealer.RevealSecondCard()
 	allDealerHandSum := gameplay.dealer.GetHandScores()
-	gameplay.consoleUi.RenderDealerCards(allDealerHandSum)
-	gameplay.consoleUi.RenderPlayerCards()
-	gameplay.consoleUi.RenderPlayerWins()
+	gameplay.ui.RenderDealerCards(allDealerHandSum)
+	gameplay.ui.RenderPlayerCards()
+	gameplay.ui.RenderPlayerWins()
 }
 
 func (gameplay *SinglePlayer) performDealerWins() {
@@ -208,9 +208,9 @@ func (gameplay *SinglePlayer) performDealerWins() {
 	gameplay.player.Loose()
 	gameplay.dealer.RevealSecondCard()
 	allDealerHandSum := gameplay.dealer.GetHandScores()
-	gameplay.consoleUi.RenderDealerCards(allDealerHandSum)
-	gameplay.consoleUi.RenderPlayerCards()
-	gameplay.consoleUi.RenderDealerWins()
+	gameplay.ui.RenderDealerCards(allDealerHandSum)
+	gameplay.ui.RenderPlayerCards()
+	gameplay.ui.RenderDealerWins()
 }
 
 func (gameplay *SinglePlayer) performDraw() {
@@ -219,7 +219,7 @@ func (gameplay *SinglePlayer) performDraw() {
 	gameplay.dealer.Win()
 	gameplay.dealer.RevealSecondCard()
 	allDealerHandSum := gameplay.dealer.GetHandScores()
-	gameplay.consoleUi.RenderDealerCards(allDealerHandSum)
-	gameplay.consoleUi.RenderPlayerCards()
-	gameplay.consoleUi.RenderDraw()
+	gameplay.ui.RenderDealerCards(allDealerHandSum)
+	gameplay.ui.RenderPlayerCards()
+	gameplay.ui.RenderDraw()
 }

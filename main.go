@@ -3,6 +3,7 @@ package main
 import (
 	"blackjack/deck"
 	"blackjack/gameplay"
+	"blackjack/ui"
 	"blackjack/wallet"
 	"fmt"
 	"github.com/hajimehoshi/ebiten"
@@ -158,7 +159,9 @@ func renderEndGame(screen *ebiten.Image, cardsSum int, startX int, startY int) {
 
 func main() {
 	gameplay := new(gameplay.SinglePlayer)
-	gameplay.Init()
+	consoleUI := new(ui.ConsoleUi)
+	var ui ui.UI = consoleUI
+	gameplay.Init(&ui)
 	if err := ebiten.Run(update, screenWidth, screenHeight, 1, "BlackJack"); err != nil {
 		log.Fatal(err)
 	}
