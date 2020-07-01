@@ -142,7 +142,8 @@ func playerDrawCard(gameplay *SinglePlayer) bool {
 		gameplay.player.Loose()
 		gameplay.whatsNext = nextStepNewGame
 		gameplay.dealer.RevealSecondCard()
-		gameplay.ui.RenderDealerCards(nil)
+		allDealerHandSum := gameplay.dealer.GetHandScores()
+		gameplay.ui.RenderDealerCards(allDealerHandSum)
 		gameplay.ui.RenderPlayerCards()
 		gameplay.ui.RenderPlayerBusted()
 		gameplay.NewGame()

@@ -62,16 +62,7 @@ func (regularPlayer *RegularPlayer) GetWalletAmount() int {
 }
 
 func (regularPlayer *RegularPlayer) IsBusted() bool {
-	busted := true
-	handScores := regularPlayer.hand.DisplayValues()
-
-	for _, score := range handScores {
-		if score < 21 {
-			busted = false
-			break
-		}
-	}
-	return busted
+	return regularPlayer.hand.GetHandCardsSum() > 21
 }
 
 func (regularPlayer *RegularPlayer) IsBlackjack() bool {
