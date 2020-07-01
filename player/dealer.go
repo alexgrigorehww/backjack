@@ -10,6 +10,11 @@ type Dealer struct {
 	hand  *hand.Hand
 }
 
+type SerializableDealer struct {
+	Score int
+	Hand  *hand.SerializableHand
+}
+
 func (dealer *Dealer) Init() {
 	dealer.hand = new(hand.Hand)
 }
@@ -81,4 +86,12 @@ func (dealer *Dealer) getHandCards() []*deck.Card {
 
 func (dealer *Dealer) RevealSecondCard() {
 	dealer.hand.GetHandCards()[1].IsVisible = true
+}
+
+func (dealer *Dealer) GetSerializable() *SerializableDealer {
+	serializableDealer := SerializableDealer{
+		Score: dealer.score,
+		Hand:  dealer.hand.GetSerializable(),
+	}
+	return &serializableDealer
 }

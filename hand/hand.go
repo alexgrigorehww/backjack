@@ -8,6 +8,10 @@ type Hand struct {
 	cards []*deck.Card
 }
 
+type SerializableHand struct {
+	Cards []*deck.SerializableCard
+}
+
 //Add card to hand
 func (h *Hand) AddCardToHand(c *deck.Card) {
 	h.cards = append(h.cards, c)
@@ -65,4 +69,15 @@ func (h *Hand) DisplayValues() []int {
 		scores = append(scores, s+aces)
 	}
 	return scores
+}
+
+func (h *Hand) GetSerializable() *SerializableHand {
+	var serializableCards []*deck.SerializableCard
+	for _, card := range h.cards {
+		serializableCards = append(serializableCards, card.GetSerializable())
+	}
+	serializableHand := SerializableHand{
+		Cards: serializableCards,
+	}
+	return &serializableHand
 }

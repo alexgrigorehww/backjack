@@ -13,6 +13,13 @@ type RegularPlayer struct {
 	Bet    int
 }
 
+type SerializableRegularPlayer struct {
+	Score  int
+	Hand   *hand.SerializableHand
+	Wallet *wallet.SerializableWallet
+	Bet    int
+}
+
 func (regularPlayer *RegularPlayer) Init() {
 	regularPlayer.hand = new(hand.Hand)
 	regularPlayer.wallet = new(wallet.Wallet)
@@ -80,4 +87,14 @@ func (regularPlayer *RegularPlayer) IsBlackjack() bool {
 
 func (regularPlayer *RegularPlayer) getHandCards() []*deck.Card {
 	return regularPlayer.hand.GetHandCards()
+}
+
+func (regularPlayer *RegularPlayer) GetSerializable() *SerializableRegularPlayer {
+	serializableRegularPlayer := SerializableRegularPlayer{
+		Score:  regularPlayer.score,
+		Hand:   regularPlayer.hand.GetSerializable(),
+		Wallet: regularPlayer.wallet.GetSerializable(),
+		Bet:    regularPlayer.Bet,
+	}
+	return &serializableRegularPlayer
 }

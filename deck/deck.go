@@ -19,6 +19,11 @@ type Deck struct {
 	discarded []*Card
 }
 
+type SerializableDeck struct {
+	Cards     []*SerializableCard
+	Discarded []*SerializableCard
+}
+
 func (d *Deck) Init() {
 	d.cards = nil
 	cardTypes := []CardType{{"clubs", '♣'}, {"diamonds", '♦'}, {"hearts", '♥'}, {"spades", '♠'}}
@@ -83,4 +88,19 @@ func (d *Deck) reveal() {
 	for i, card := range d.cards {
 		fmt.Printf("Card %d: \t %s \n", i, card.GetDisplayingValue()+card.GetSymbol())
 	}
+}
+
+func (d *Deck) GetSerializable() *SerializableDeck {
+	var serializableCards, discardedSerializableCards []*SerializableCard
+	for _, card := range d.cards {
+		serializableCards = append(serializableCards, card.GetSerializable())
+	}
+	for _, card := range d.discarded {
+		discardedSerializableCards = append(discardedSerializableCards, card.GetSerializable())
+	}
+	serializableDeck := SerializableDeck{
+		Cards:     serializableCards,
+		Discarded: discardedSerializableCards,
+	}
+	return &serializableDeck
 }

@@ -4,7 +4,9 @@ import (
 	"blackjack/deck"
 	"blackjack/player"
 	"blackjack/ui"
+	"encoding/json"
 	"errors"
+	"io/ioutil"
 )
 
 const (
@@ -21,6 +23,13 @@ type SinglePlayer struct {
 	player    *player.RegularPlayer
 	deck      *deck.Deck
 	ui        ui.UI
+}
+
+type SerializableSinglePlayer struct {
+	WhatsNext string
+	Dealer    *player.SerializableDealer
+	Player    *player.SerializableRegularPlayer
+	Deck      *deck.SerializableDeck
 }
 
 func (gameplay *SinglePlayer) Init(ui *ui.UI) (err error) {
@@ -84,6 +93,7 @@ func (gameplay *SinglePlayer) Deal() (err error) {
 }
 
 func (gameplay *SinglePlayer) Hit() (err error) {
+	gameplay.saveGame()
 	if gameplay.whatsNext != nextStepHitOrStand {
 		err = errors.New("invalid gameplay state. you cannot hit")
 		return
@@ -193,6 +203,26 @@ func (gameplay *SinglePlayer) evaluate() {
 		gameplay.performDraw()
 		return
 	}
+}
+
+func (gameplay *SinglePlayer) getSerializable() *SerializableSinglePlayer {
+	serializableGameplay := SerializableSinglePlayer{
+		WhatsNext: gameplay.whatsNext,
+		Dealer:    gameplay.dealer.GetSerializable(),
+		Player:    gameplay.player.GetSerializable(),
+		Deck:      gameplay.deck.GetSerializable(),
+	}
+	return &serializableGameplay
+}
+
+func (gameplay *SinglePlayer) saveGame() error {
+	serializable := gameplay.getSerializable()
+	b, err := json.Marshal(serializable)
+	if err != nil {
+		return err
+	}
+	ioutil.WriteFile("restoreFile.json", b, 0644)
+	return nil
 }
 
 func (gameplay *SinglePlayer) performPlayerWins() {

@@ -2,6 +2,7 @@ package deck_test
 
 import (
 	"blackjack/deck"
+	"strconv"
 	"testing"
 )
 
@@ -58,9 +59,13 @@ func TestCard_GetBlackjackValue(t *testing.T) {
 func TestCard_Serialize(t *testing.T) {
 	var card deck.Card
 	card.SetCard(10, "", ' ')
-	serialized, _ := card.Serialize()
-	if serialized != mockedSerialization {
-		t.Error("wrong serialization")
+	serialized := card.GetSerializable()
+	if serialized.IsVisible != card.IsVisible {
+		t.Error("wrong isVisible field")
+	}
+	val, _ := strconv.Atoi(card.GetDisplayingValue())
+	if serialized.Value != val {
+		t.Error("wrong value")
 	}
 }
 

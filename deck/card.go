@@ -53,22 +53,17 @@ func (c *Card) GetDisplayingValue() string {
 	}
 }
 
-func (c *Card) Serialize() (result string, err error) {
+func (c *Card) GetSerializable() *SerializableCard {
 	cardTypeJson := SerializableCardType{
 		Name:   c.cardType.name,
 		Symbol: c.cardType.symbol,
 	}
-	cardJson := SerializableCard{
+	serializableCard := SerializableCard{
 		Value:     c.value,
 		CardType:  &cardTypeJson,
 		IsVisible: c.IsVisible,
 	}
-	b, err := json.Marshal(cardJson)
-	if err != nil {
-		return
-	}
-	result = string(b)
-	return
+	return &serializableCard
 }
 
 func DeserializeCard(s string) Card {
@@ -76,8 +71,8 @@ func DeserializeCard(s string) Card {
 	b := []byte(s)
 	json.Unmarshal(b, &serializableCard)
 	return Card{
-		value:     serializableCard.Value,
-		cardType:  &CardType{
+		value: serializableCard.Value,
+		cardType: &CardType{
 			name:   serializableCard.CardType.Name,
 			symbol: serializableCard.CardType.Symbol,
 		},
