@@ -3,6 +3,7 @@ package ui
 import (
 	"blackjack/deck"
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -24,16 +25,29 @@ func (consoleUi *ConsoleUi) cleanUi() {
 	consoleUi.playerSums = nil
 }
 
-func (consoleUi *ConsoleUi) RenderCleanTableWithBettingOptions(setBet func(int) error, walletAmount int) {
-	bet, err := strconv.Atoi(read("New Game! Your wallet: " + strconv.Itoa(walletAmount) + ". Type your bet"))
-	if err != nil {
-		consoleUi.RenderCleanTableWithBettingOptions(setBet, walletAmount)
-	} else {
-		consoleUi.cleanUi()
-		err := setBet(bet)
+func (consoleUi *ConsoleUi) RenderCleanTableWithBettingOptions(setBet func(int) error, saveGame func() error, restoreGame func() error, walletAmount int) {
+	fmt.Println("New Game! Your wallet :" + strconv.Itoa(walletAmount))
+	option := read("You can save (s) / restore (r) or choose your bet: ")
+	var err error
+	switch option {
+	case "s":
+		err = saveGame()
+		consoleUi.RenderCleanTableWithBettingOptions(setBet, saveGame, restoreGame, walletAmount)
+	case "r":
+		err = restoreGame()
+		consoleUi.RenderCleanTableWithBettingOptions(setBet, saveGame, restoreGame, walletAmount)
+	default:
+		bet, err := strconv.Atoi(option)
 		if err != nil {
-			fmt.Println(err)
+			err = errors.New("invalid option")
+			consoleUi.RenderCleanTableWithBettingOptions(setBet, saveGame, restoreGame, walletAmount)
+		} else {
+			consoleUi.cleanUi()
+			err = setBet(bet)
 		}
+	}
+	if err != nil {
+		fmt.Println(err)
 	}
 }
 

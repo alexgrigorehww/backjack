@@ -3,7 +3,7 @@ package ui
 import "blackjack/deck"
 
 type UI interface {
-	RenderCleanTableWithBettingOptions(setBet func(int) error, walletAmount int)
+	RenderCleanTableWithBettingOptions(setBet func(int) error, saveGame func() error, restoreGame func() error, walletAmount int)
 	RenderDeal(deal func() error)
 	RenderHitOrStand(hit func() error, stand func() error)
 	AddPlayerCard(card *deck.Card, playerSums []int)

@@ -93,7 +93,6 @@ func (gameplay *SinglePlayer) Deal() (err error) {
 }
 
 func (gameplay *SinglePlayer) Hit() (err error) {
-	gameplay.saveGame()
 	if gameplay.whatsNext != nextStepHitOrStand {
 		err = errors.New("invalid gameplay state. you cannot hit")
 		return
@@ -139,7 +138,7 @@ func (gameplay *SinglePlayer) NewGame() (err error) {
 	gameplay.player.DiscardAllCards(gameplay.deck)
 	gameplay.whatsNext = nextStepSetBet
 	walletAmount := gameplay.player.GetWalletAmount()
-	gameplay.ui.RenderCleanTableWithBettingOptions(gameplay.SetBet, walletAmount)
+	gameplay.ui.RenderCleanTableWithBettingOptions(gameplay.SetBet, gameplay.SaveGame, gameplay.SaveGame, walletAmount)
 	return
 }
 
@@ -215,7 +214,7 @@ func (gameplay *SinglePlayer) getSerializable() *SerializableSinglePlayer {
 	return &serializableGameplay
 }
 
-func (gameplay *SinglePlayer) saveGame() error {
+func (gameplay *SinglePlayer) SaveGame() error {
 	serializable := gameplay.getSerializable()
 	b, err := json.Marshal(serializable)
 	if err != nil {
