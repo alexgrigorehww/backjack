@@ -32,3 +32,10 @@ func (w *Wallet) GetSerializable() *SerializableWallet {
 	}
 	return &serializableWallet
 }
+
+func (w *SerializableWallet) Deserialize() *Wallet {
+	serializableWallet := Wallet{
+		amount: w.Amount,
+	}
+	return &serializableWallet
+}

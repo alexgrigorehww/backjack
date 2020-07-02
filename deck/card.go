@@ -1,7 +1,6 @@
 package deck
 
 import (
-	"encoding/json"
 	"strconv"
 )
 
@@ -66,11 +65,8 @@ func (c *Card) GetSerializable() *SerializableCard {
 	return &serializableCard
 }
 
-func DeserializeCard(s string) Card {
-	serializableCard := new(SerializableCard)
-	b := []byte(s)
-	json.Unmarshal(b, &serializableCard)
-	return Card{
+func (serializableCard *SerializableCard) DeserializeCard() *Card {
+	return &Card{
 		value: serializableCard.Value,
 		cardType: &CardType{
 			name:   serializableCard.CardType.Name,

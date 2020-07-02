@@ -29,7 +29,6 @@ func (dealer *Dealer) Win() int {
 }
 
 func (dealer *Dealer) Loose() int {
-	dealer.score--
 	return 0
 }
 
@@ -94,4 +93,12 @@ func (dealer *Dealer) GetSerializable() *SerializableDealer {
 		Hand:  dealer.hand.GetSerializable(),
 	}
 	return &serializableDealer
+}
+
+func (serializableDealer *SerializableDealer) Deserialize() *Dealer {
+	dealer := Dealer{
+		score: serializableDealer.Score,
+		hand:  serializableDealer.Hand.Deserialize(),
+	}
+	return &dealer
 }

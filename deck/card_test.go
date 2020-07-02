@@ -68,16 +68,3 @@ func TestCard_Serialize(t *testing.T) {
 		t.Error("wrong value")
 	}
 }
-
-func TestCard_Deserialize(t *testing.T) {
-	card := deck.DeserializeCard(mockedSerialization)
-	if card.IsVisible != false {
-		t.Error("wrong visibility")
-	}
-	if card.GetDisplayingValue() != "10" {
-		t.Error("wrong value")
-	}
-	if card.GetSymbol() != string(' ') {
-		t.Error("wrong symbol")
-	}
-}

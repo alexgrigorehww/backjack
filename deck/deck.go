@@ -104,3 +104,18 @@ func (d *Deck) GetSerializable() *SerializableDeck {
 	}
 	return &serializableDeck
 }
+
+func (serializableDeck *SerializableDeck) DeserializeDeck() *Deck {
+	var cards, discardedCards []*Card
+	for _, card := range serializableDeck.Cards {
+		cards = append(cards, card.DeserializeCard())
+	}
+	for _, card := range serializableDeck.Discarded {
+		discardedCards = append(discardedCards, card.DeserializeCard())
+	}
+	deck := Deck{
+		cards:     cards,
+		discarded: discardedCards,
+	}
+	return &deck
+}

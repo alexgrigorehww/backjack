@@ -15,6 +15,7 @@ const (
 	nextStepDeal       = "DEAL"
 	nextStepHitOrStand = "HIT_OR_STAND"
 	nextStepNewGame    = "NEW_GAME"
+	restoreFile        = "restoreFile.json"
 )
 
 type SinglePlayer struct {
@@ -138,7 +139,7 @@ func (gameplay *SinglePlayer) NewGame() (err error) {
 	gameplay.player.DiscardAllCards(gameplay.deck)
 	gameplay.whatsNext = nextStepSetBet
 	walletAmount := gameplay.player.GetWalletAmount()
-	gameplay.ui.RenderCleanTableWithBettingOptions(gameplay.SetBet, gameplay.SaveGame, gameplay.SaveGame, walletAmount)
+	gameplay.ui.RenderCleanTableWithBettingOptions(gameplay.SetBet, gameplay.SaveGame, gameplay.RestoreGame, walletAmount)
 	return
 }
 
@@ -214,13 +215,47 @@ func (gameplay *SinglePlayer) getSerializable() *SerializableSinglePlayer {
 	return &serializableGameplay
 }
 
+func (serializableGameplay *SerializableSinglePlayer) deserialize() *SinglePlayer {
+	gameplay := SinglePlayer{
+		whatsNext: serializableGameplay.WhatsNext,
+		dealer:    serializableGameplay.Dealer.Deserialize(),
+		player:    serializableGameplay.Player.Deserialize(),
+		deck:      serializableGameplay.Deck.DeserializeDeck(),
+	}
+	return &gameplay
+}
+
 func (gameplay *SinglePlayer) SaveGame() error {
 	serializable := gameplay.getSerializable()
 	b, err := json.Marshal(serializable)
 	if err != nil {
 		return err
 	}
-	ioutil.WriteFile("restoreFile.json", b, 0644)
+	ioutil.WriteFile(restoreFile, b, 0644)
+	gameplay.whatsNext = nextStepNewGame
+	gameplay.NewGame()
+	return nil
+}
+
+func (gameplay *SinglePlayer) RestoreGame() error {
+	b, err := ioutil.ReadFile(restoreFile)
+	if err != nil {
+		return err
+	}
+	var serializableSinglePlayer SerializableSinglePlayer
+	err = json.Unmarshal(b, &serializableSinglePlayer)
+	if err != nil {
+		return err
+	}
+	restoredGameplay := serializableSinglePlayer.deserialize()
+	gameplay.deck = restoredGameplay.deck
+	gameplay.player = restoredGameplay.player
+	gameplay.dealer = restoredGameplay.dealer
+	gameplay.whatsNext = restoredGameplay.whatsNext
+
+	gameplay.whatsNext = nextStepNewGame
+	gameplay.NewGame()
+
 	return nil
 }
 

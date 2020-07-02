@@ -36,7 +36,6 @@ func (regularPlayer *RegularPlayer) Win() int {
 }
 
 func (regularPlayer *RegularPlayer) Loose() int {
-	regularPlayer.score--
 	return regularPlayer.wallet.LostMoney(regularPlayer.Bet)
 }
 
@@ -97,4 +96,14 @@ func (regularPlayer *RegularPlayer) GetSerializable() *SerializableRegularPlayer
 		Bet:    regularPlayer.Bet,
 	}
 	return &serializableRegularPlayer
+}
+
+func (serializableRegularPlayer *SerializableRegularPlayer) Deserialize() *RegularPlayer {
+	regularPlayer := RegularPlayer{
+		score:  serializableRegularPlayer.Score,
+		hand:   serializableRegularPlayer.Hand.Deserialize(),
+		wallet: serializableRegularPlayer.Wallet.Deserialize(),
+		Bet:    serializableRegularPlayer.Bet,
+	}
+	return &regularPlayer
 }

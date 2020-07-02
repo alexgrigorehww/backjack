@@ -81,3 +81,14 @@ func (h *Hand) GetSerializable() *SerializableHand {
 	}
 	return &serializableHand
 }
+
+func (h *SerializableHand) Deserialize() *Hand {
+	var cards []*deck.Card
+	for _, card := range h.Cards {
+		cards = append(cards, card.DeserializeCard())
+	}
+	hand := Hand{
+		cards: cards,
+	}
+	return &hand
+}
