@@ -33,6 +33,7 @@ type SerializableSinglePlayer struct {
 	Deck      *deck.SerializableDeck
 }
 
+
 func (gameplay *SinglePlayer) Init(ui *ui.UI) (err error) {
 	if gameplay.whatsNext != nextStepInit {
 		err = errors.New("invalid gameplay state. cannot initialize the game")
@@ -58,12 +59,12 @@ func (gameplay *SinglePlayer) Init(ui *ui.UI) (err error) {
 	gameplay.player = player
 
 	gameplay.whatsNext = nextStepNewGame
-	gameplay.NewGame()
+	gameplay.newGame()
 
 	return
 }
 
-func (gameplay *SinglePlayer) SetBet(bet int) (err error) {
+func (gameplay *SinglePlayer) setBet(bet int) (err error) {
 	if gameplay.whatsNext != nextStepSetBet {
 		err = errors.New("invalid gameplay state. you cannot set bet")
 		return
@@ -73,12 +74,12 @@ func (gameplay *SinglePlayer) SetBet(bet int) (err error) {
 		return
 	}
 	gameplay.player.Bet = bet
-	gameplay.ui.RenderDeal(gameplay.Deal)
+	gameplay.ui.RenderDeal(gameplay.deal)
 	gameplay.whatsNext = nextStepDeal
 	return
 }
 
-func (gameplay *SinglePlayer) Deal() (err error) {
+func (gameplay *SinglePlayer) deal() (err error) {
 	if gameplay.whatsNext != nextStepSetBet {
 		err = errors.New("invalid gameplay state. you cannot deal")
 		return
@@ -89,23 +90,23 @@ func (gameplay *SinglePlayer) Deal() (err error) {
 	dealerDrawCard(gameplay)
 
 	gameplay.whatsNext = nextStepHitOrStand
-	gameplay.ui.RenderHitOrStand(gameplay.Hit, gameplay.Stand)
+	gameplay.ui.RenderHitOrStand(gameplay.hit, gameplay.stand)
 	return
 }
 
-func (gameplay *SinglePlayer) Hit() (err error) {
+func (gameplay *SinglePlayer) hit() (err error) {
 	if gameplay.whatsNext != nextStepHitOrStand {
 		err = errors.New("invalid gameplay state. you cannot hit")
 		return
 	}
 	shouldStop := playerDrawCard(gameplay)
 	if !shouldStop {
-		gameplay.ui.RenderHitOrStand(gameplay.Hit, gameplay.Stand)
+		gameplay.ui.RenderHitOrStand(gameplay.hit, gameplay.stand)
 	}
 	return
 }
 
-func (gameplay *SinglePlayer) Stand() (err error) {
+func (gameplay *SinglePlayer) stand() (err error) {
 	if gameplay.whatsNext != nextStepHitOrStand {
 		err = errors.New("invalid gameplay state. you cannot stand")
 		return
@@ -119,14 +120,14 @@ func (gameplay *SinglePlayer) Stand() (err error) {
 		if dealerScore >= 17 {
 			gameplay.evaluate()
 			gameplay.whatsNext = nextStepNewGame
-			gameplay.NewGame()
+			gameplay.newGame()
 			break
 		}
 	}
 	return
 }
 
-func (gameplay *SinglePlayer) NewGame() (err error) {
+func (gameplay *SinglePlayer) newGame() (err error) {
 	if gameplay.whatsNext != nextStepNewGame {
 		err = errors.New("invalid gameplay state. you cannot start new game")
 		return
@@ -139,7 +140,7 @@ func (gameplay *SinglePlayer) NewGame() (err error) {
 	gameplay.player.DiscardAllCards(gameplay.deck)
 	gameplay.whatsNext = nextStepSetBet
 	walletAmount := gameplay.player.GetWalletAmount()
-	gameplay.ui.RenderCleanTableWithBettingOptions(gameplay.SetBet, gameplay.SaveGame, gameplay.RestoreGame, walletAmount)
+	gameplay.ui.RenderCleanTableWithBettingOptions(gameplay.setBet, gameplay.saveGame, gameplay.restoreGame, walletAmount)
 	return
 }
 
@@ -156,11 +157,11 @@ func playerDrawCard(gameplay *SinglePlayer) bool {
 		gameplay.ui.RenderDealerCards(allDealerHandSum)
 		gameplay.ui.RenderPlayerCards()
 		gameplay.ui.RenderPlayerBusted()
-		gameplay.NewGame()
+		gameplay.newGame()
 		return true
 	}
 	if gameplay.player.IsBlackjack() {
-		gameplay.Stand()
+		gameplay.stand()
 		return true
 	}
 	return false
@@ -173,7 +174,7 @@ func dealerDrawCard(gameplay *SinglePlayer) bool {
 	if gameplay.dealer.IsBusted() {
 		gameplay.performPlayerWins()
 		gameplay.whatsNext = nextStepNewGame
-		gameplay.NewGame()
+		gameplay.newGame()
 		return true
 	}
 	return false
@@ -225,27 +226,30 @@ func (serializableGameplay *SerializableSinglePlayer) deserialize() *SinglePlaye
 	return &gameplay
 }
 
-func (gameplay *SinglePlayer) SaveGame() error {
+func (gameplay *SinglePlayer) saveGame(ch chan error) {
 	serializable := gameplay.getSerializable()
 	b, err := json.Marshal(serializable)
 	if err != nil {
-		return err
+		ch <- err
+		return
 	}
 	ioutil.WriteFile(restoreFile, b, 0644)
 	gameplay.whatsNext = nextStepNewGame
-	gameplay.NewGame()
-	return nil
+	gameplay.newGame()
+	ch <- nil
 }
 
-func (gameplay *SinglePlayer) RestoreGame() error {
+func (gameplay *SinglePlayer) restoreGame(ch chan error) {
 	b, err := ioutil.ReadFile(restoreFile)
 	if err != nil {
-		return err
+		ch <- err
+		return
 	}
 	var serializableSinglePlayer SerializableSinglePlayer
 	err = json.Unmarshal(b, &serializableSinglePlayer)
 	if err != nil {
-		return err
+		ch <- err
+		return
 	}
 	restoredGameplay := serializableSinglePlayer.deserialize()
 	gameplay.deck = restoredGameplay.deck
@@ -254,9 +258,9 @@ func (gameplay *SinglePlayer) RestoreGame() error {
 	gameplay.whatsNext = restoredGameplay.whatsNext
 
 	gameplay.whatsNext = nextStepNewGame
-	gameplay.NewGame()
-
-	return nil
+	gameplay.newGame()
+	ch <- nil
+	return
 }
 
 func (gameplay *SinglePlayer) performPlayerWins() {

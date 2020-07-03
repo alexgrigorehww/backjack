@@ -1,15 +1,16 @@
 package main
 
 import (
+	"image"
+	"image/color"
+	"log"
+
 	"github.com/golang/freetype/truetype"
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/text"
 	"golang.org/x/image/colornames"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/gofont/goregular"
-	"image"
-	"image/color"
-	"log"
 )
 
 var (
@@ -42,6 +43,7 @@ func init() {
 	fontSMHeight = (b.Max.Y - b.Min.Y).Ceil()
 }
 
+// Card represents a piece from Deck
 type Card struct {
 	Rect   image.Rectangle
 	Number string
@@ -49,6 +51,7 @@ type Card struct {
 	Color  color.RGBA
 }
 
+// Draw draws a card
 func (c *Card) Draw(dst *ebiten.Image) {
 	cardColorBg := color.RGBA{0xff, 0xff, 0xff, 0xff}
 	cardColor := colornames.Black

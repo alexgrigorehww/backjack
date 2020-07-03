@@ -25,18 +25,21 @@ func (consoleUi *ConsoleUi) cleanUi() {
 	consoleUi.playerSums = nil
 }
 
-func (consoleUi *ConsoleUi) RenderCleanTableWithBettingOptions(setBet func(int) error, saveGame func() error, restoreGame func() error, walletAmount int) {
+func (consoleUi *ConsoleUi) RenderCleanTableWithBettingOptions(setBet func(int) error, saveGame func(chan error), restoreGame func(chan error), walletAmount int) {
 	fmt.Println("New Game! Your wallet :" + strconv.Itoa(walletAmount))
 	option := read("You can save (s) / restore (r) or choose your bet")
 	var err error
+	ch := make(chan error)
 	switch option {
 	case "s":
-		err = saveGame()
+		go saveGame(ch)
+		err = <-ch
 		if err != nil {
 			fmt.Println(err)
 		}
 	case "r":
-		err = restoreGame()
+		go restoreGame(ch)
+		err = <-ch
 		if err != nil {
 			fmt.Println(err)
 		}
