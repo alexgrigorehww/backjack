@@ -37,8 +37,8 @@ type EbitenUI struct {
 	bustText      *RenderText
 	cardSum       map[string]int
 
-	walletAmount  int
-	status        string
+	walletAmount int
+	status       string
 }
 
 func (ui *EbitenUI) newGame() {
@@ -132,7 +132,7 @@ func (ui *EbitenUI) RenderDeal() {
 	ui.status = "deal"
 }
 
-func (ui *EbitenUI) SetGameplayActions(setBet func(int) error, saveGame func(chan error), restoreGame func(chan error), newGame func() error, deal func() error,hit func() error, stand func() error){
+func (ui *EbitenUI) SetGameplayActions(setBet func(int) error, saveGame func(chan error), restoreGame func(chan error), newGame func() error, deal func() error, hit func() error, stand func() error) {
 	ui.buttonNewGame.SetOnPressed(func(b *Button) {
 		err := newGame()
 		if err != nil {
