@@ -30,8 +30,8 @@ func TestDealer_Loose(t *testing.T) {
 	dealer.Init()
 	dealer.Loose()
 	score := dealer.GetScore()
-	if score != -1 {
-		t.Errorf("The dealer score should be %d after winning", -1)
+	if score != 0 {
+		t.Errorf("The dealer score should be %d after loosing", 0)
 	}
 }
 

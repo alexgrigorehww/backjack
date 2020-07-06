@@ -1,17 +1,18 @@
-package main
+package ebitenui
 
 import (
 	"bytes"
+	"image"
+	"image/color"
+	_ "image/png"
+	"log"
+
 	"github.com/golang/freetype/truetype"
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/examples/resources/images"
 	"github.com/hajimehoshi/ebiten/text"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/gofont/goregular"
-	"image"
-	"image/color"
-	_ "image/png"
-	"log"
 )
 
 type imageType int

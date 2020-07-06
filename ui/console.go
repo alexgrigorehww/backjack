@@ -16,6 +16,14 @@ type ConsoleUi struct {
 
 	playerCards []*deck.Card
 	playerSums  []int
+
+	setBet      func(int) error
+	saveGame    func(chan error)
+	restoreGame func(chan error)
+	newGame     func() error
+	deal        func() error
+	hit         func() error
+	stand       func() error
 }
 
 func (consoleUi *ConsoleUi) cleanUi() {
@@ -25,20 +33,30 @@ func (consoleUi *ConsoleUi) cleanUi() {
 	consoleUi.playerSums = nil
 }
 
-func (consoleUi *ConsoleUi) RenderCleanTableWithBettingOptions(setBet func(int) error, saveGame func(chan error), restoreGame func(chan error), walletAmount int) {
+func (consoleUi *ConsoleUi) SetGameplayActions(setBet func(int) error, saveGame func(chan error), restoreGame func(chan error), newGame func() error, deal func() error, hit func() error, stand func() error) {
+	consoleUi.setBet = setBet
+	consoleUi.saveGame = saveGame
+	consoleUi.restoreGame = restoreGame
+	consoleUi.newGame = newGame
+	consoleUi.deal = deal
+	consoleUi.hit = hit
+	consoleUi.stand = stand
+}
+
+func (consoleUi *ConsoleUi) RenderCleanTableWithBettingOptions(walletAmount int) {
 	fmt.Println("New Game! Your wallet :" + strconv.Itoa(walletAmount))
 	option := read("You can save (s) / restore (r) or choose your bet")
 	var err error
 	ch := make(chan error)
 	switch option {
 	case "s":
-		go saveGame(ch)
+		go consoleUi.saveGame(ch)
 		err = <-ch
 		if err != nil {
 			fmt.Println(err)
 		}
 	case "r":
-		go restoreGame(ch)
+		go consoleUi.restoreGame(ch)
 		err = <-ch
 		if err != nil {
 			fmt.Println(err)
@@ -47,10 +65,10 @@ func (consoleUi *ConsoleUi) RenderCleanTableWithBettingOptions(setBet func(int) 
 		bet, err := strconv.Atoi(option)
 		if err != nil {
 			err = errors.New("invalid option")
-			consoleUi.RenderCleanTableWithBettingOptions(setBet, saveGame, restoreGame, walletAmount)
+			consoleUi.RenderCleanTableWithBettingOptions(walletAmount)
 		} else {
 			consoleUi.cleanUi()
-			err = setBet(bet)
+			err = consoleUi.setBet(bet)
 		}
 	}
 	if err != nil {
@@ -58,31 +76,31 @@ func (consoleUi *ConsoleUi) RenderCleanTableWithBettingOptions(setBet func(int) 
 	}
 }
 
-func (consoleUi *ConsoleUi) RenderDeal(deal func() error) {
+func (consoleUi *ConsoleUi) RenderDeal() {
 	dealRes := read("You want to deal? (y/n)")
 	if dealRes == "y" {
-		deal()
+		consoleUi.deal()
 	} else {
-		consoleUi.RenderDeal(deal)
+		consoleUi.RenderDeal()
 	}
 }
 
-func (consoleUi *ConsoleUi) RenderHitOrStand(hit func() error, stand func() error) {
+func (consoleUi *ConsoleUi) RenderHitOrStand() {
 	consoleUi.RenderDealerCards(nil)
 	consoleUi.RenderPlayerCards()
 	action := read("HIT (h) / STAND (s)")
 	if action == "h" {
-		err := hit()
+		err := consoleUi.hit()
 		if err != nil {
 			fmt.Println(err)
 		}
 	} else if action == "s" {
-		err := stand()
+		err := consoleUi.stand()
 		if err != nil {
 			fmt.Println(err)
 		}
 	} else {
-		consoleUi.RenderHitOrStand(hit, stand)
+		consoleUi.RenderHitOrStand()
 	}
 }
 
@@ -98,18 +116,22 @@ func (consoleUi *ConsoleUi) AddDealerCard(card *deck.Card, dealerSums []int) {
 
 func (consoleUi *ConsoleUi) RenderPlayerBusted() {
 	println("Player busted")
+	consoleUi.newGame()
 }
 
 func (consoleUi *ConsoleUi) RenderPlayerWins() {
 	println("Player wins!")
+	consoleUi.newGame()
 }
 
 func (consoleUi *ConsoleUi) RenderDraw() {
 	println("DRAW")
+	consoleUi.newGame()
 }
 
 func (consoleUi *ConsoleUi) RenderDealerWins() {
 	println("Dealer wins")
+	consoleUi.newGame()
 }
 
 func (consoleUi *ConsoleUi) RenderDealerCards(handSum []int) {

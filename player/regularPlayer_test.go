@@ -37,11 +37,11 @@ func TestRegularPlayer_Loose(t *testing.T) {
 	regularPlayer.Bet = bet
 	regularPlayer.Loose()
 	score := regularPlayer.GetScore()
-	if score != -1 {
-		t.Errorf("The regularPlayer score should be %d after winning", -1)
+	if score != 0 {
+		t.Errorf("The regularPlayer score should be %d after loosing", 0)
 	}
 	if regularPlayer.GetWalletAmount() != initAmount-bet {
-		t.Errorf("The regularPlayer wallet amount should be %d after winning", -bet)
+		t.Errorf("The regularPlayer wallet amount should be %d after loosing", -bet)
 	}
 }
 

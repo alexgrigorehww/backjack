@@ -33,7 +33,6 @@ type SerializableSinglePlayer struct {
 	Deck      *deck.SerializableDeck
 }
 
-
 func (gameplay *SinglePlayer) Init(ui *ui.UI) (err error) {
 	if gameplay.whatsNext != nextStepInit {
 		err = errors.New("invalid gameplay state. cannot initialize the game")
@@ -52,6 +51,7 @@ func (gameplay *SinglePlayer) Init(ui *ui.UI) (err error) {
 
 	// init UI
 	gameplay.ui = *ui
+	gameplay.ui.SetGameplayActions(gameplay.setBet, gameplay.saveGame, gameplay.restoreGame, gameplay.newGame, gameplay.deal, gameplay.hit, gameplay.stand)
 
 	// init gameplay
 	gameplay.deck = theDeck
@@ -60,7 +60,6 @@ func (gameplay *SinglePlayer) Init(ui *ui.UI) (err error) {
 
 	gameplay.whatsNext = nextStepNewGame
 	gameplay.newGame()
-
 	return
 }
 
@@ -74,13 +73,13 @@ func (gameplay *SinglePlayer) setBet(bet int) (err error) {
 		return
 	}
 	gameplay.player.Bet = bet
-	gameplay.ui.RenderDeal(gameplay.deal)
 	gameplay.whatsNext = nextStepDeal
+	gameplay.ui.RenderDeal()
 	return
 }
 
 func (gameplay *SinglePlayer) deal() (err error) {
-	if gameplay.whatsNext != nextStepSetBet {
+	if gameplay.whatsNext != nextStepDeal {
 		err = errors.New("invalid gameplay state. you cannot deal")
 		return
 	}
@@ -90,7 +89,7 @@ func (gameplay *SinglePlayer) deal() (err error) {
 	dealerDrawCard(gameplay)
 
 	gameplay.whatsNext = nextStepHitOrStand
-	gameplay.ui.RenderHitOrStand(gameplay.hit, gameplay.stand)
+	gameplay.ui.RenderHitOrStand()
 	return
 }
 
@@ -101,7 +100,7 @@ func (gameplay *SinglePlayer) hit() (err error) {
 	}
 	shouldStop := playerDrawCard(gameplay)
 	if !shouldStop {
-		gameplay.ui.RenderHitOrStand(gameplay.hit, gameplay.stand)
+		gameplay.ui.RenderHitOrStand()
 	}
 	return
 }
@@ -118,9 +117,8 @@ func (gameplay *SinglePlayer) stand() (err error) {
 		}
 		dealerScore := gameplay.dealer.GetHandScore()
 		if dealerScore >= 17 {
-			gameplay.evaluate()
 			gameplay.whatsNext = nextStepNewGame
-			gameplay.newGame()
+			gameplay.evaluate()
 			break
 		}
 	}
@@ -140,7 +138,7 @@ func (gameplay *SinglePlayer) newGame() (err error) {
 	gameplay.player.DiscardAllCards(gameplay.deck)
 	gameplay.whatsNext = nextStepSetBet
 	walletAmount := gameplay.player.GetWalletAmount()
-	gameplay.ui.RenderCleanTableWithBettingOptions(gameplay.setBet, gameplay.saveGame, gameplay.restoreGame, walletAmount)
+	gameplay.ui.RenderCleanTableWithBettingOptions(walletAmount)
 	return
 }
 
@@ -157,7 +155,6 @@ func playerDrawCard(gameplay *SinglePlayer) bool {
 		gameplay.ui.RenderDealerCards(allDealerHandSum)
 		gameplay.ui.RenderPlayerCards()
 		gameplay.ui.RenderPlayerBusted()
-		gameplay.newGame()
 		return true
 	}
 	if gameplay.player.IsBlackjack() {
@@ -172,9 +169,8 @@ func dealerDrawCard(gameplay *SinglePlayer) bool {
 	scores := gameplay.dealer.GetHandScores()
 	gameplay.ui.AddDealerCard(card, scores)
 	if gameplay.dealer.IsBusted() {
-		gameplay.performPlayerWins()
 		gameplay.whatsNext = nextStepNewGame
-		gameplay.newGame()
+		gameplay.performPlayerWins()
 		return true
 	}
 	return false

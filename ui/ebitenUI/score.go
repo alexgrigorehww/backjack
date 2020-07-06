@@ -1,14 +1,15 @@
-package main
+package ebitenui
 
 import (
 	"fmt"
+	"image/color"
+	"log"
+
 	"github.com/golang/freetype/truetype"
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/text"
 	"golang.org/x/image/font"
-	"image/color"
-	"log"
 )
 
 var (
