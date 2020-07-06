@@ -207,10 +207,10 @@ func (ui *EbitenUI) renderPlayerCards(screen *ebiten.Image) {
 	cardsSum := ui.playerSums[0]
 	for uk, card := range ui.playerCards {
 		if !card.IsVisible {
-			drawNinePatches(screen, image.Rect(startX+15*uk, startY, startX+75+15*uk, startY+125), imageSrcRects[imageTypeButton], colornames.Darkgreen)
+			drawNinePatches(screen, image.Rect(startX+25*uk, startY, startX+75+25*uk, startY+125), imageSrcRects[imageTypeButton], colornames.Darkgreen)
 		} else {
 			(&Card{
-				Rect:   image.Rect(startX+15*uk, startY, startX+75+15*uk, startY+125),
+				Rect:   image.Rect(startX+25*uk, startY, startX+75+25*uk, startY+125),
 				Number: card.GetDisplayingValue(),
 				Sign:   card.GetSymbol(),
 			}).Draw(screen)
@@ -227,10 +227,10 @@ func (ui *EbitenUI) renderDealerCards(screen *ebiten.Image) {
 	cardsSum := ui.dealerSums[0]
 	for uk, card := range ui.dealerCards {
 		if !card.IsVisible {
-			drawNinePatches(screen, image.Rect(startX+15*uk, startY, startX+75+15*uk, startY+125), imageSrcRects[imageTypeButton], colornames.Darkgreen)
+			drawNinePatches(screen, image.Rect(startX+25*uk, startY, startX+75+25*uk, startY+125), imageSrcRects[imageTypeButton], colornames.Darkgreen)
 		} else {
 			(&Card{
-				Rect:   image.Rect(startX+15*uk, startY, startX+75+15*uk, startY+125),
+				Rect:   image.Rect(startX+25*uk, startY, startX+75+25*uk, startY+125),
 				Number: card.GetDisplayingValue(),
 				Sign:   card.GetSymbol(),
 			}).Draw(screen)
@@ -284,9 +284,10 @@ func (ui *EbitenUI) update(screen *ebiten.Image) error {
 		return nil
 	}
 
-	//// Fill background
+	// Fill background
 	screen.Fill(color.RGBA{0xeb, 0xeb, 0xeb, 0xff})
 
+	// UI elements
 	ui.score.Draw(screen, ui.walletAmount)
 	ui.renderDealerCards(screen)
 	ui.renderPlayerCards(screen)

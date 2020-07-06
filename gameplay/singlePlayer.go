@@ -110,6 +110,7 @@ func (gameplay *SinglePlayer) stand() (err error) {
 		err = errors.New("invalid gameplay state. you cannot stand")
 		return
 	}
+	gameplay.dealer.RevealSecondCard()
 	for {
 		shouldStop := dealerDrawCard(gameplay)
 		if shouldStop {
