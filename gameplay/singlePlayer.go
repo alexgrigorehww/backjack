@@ -73,6 +73,7 @@ func (gameplay *SinglePlayer) setBet(bet int) (err error) {
 		return
 	}
 	gameplay.player.Bet = bet
+	gameplay.dealer.Bet = bet
 	gameplay.whatsNext = nextStepDeal
 	gameplay.ui.RenderDeal()
 	return
@@ -261,7 +262,7 @@ func (gameplay *SinglePlayer) restoreGame(ch chan error) {
 }
 
 func (gameplay *SinglePlayer) performPlayerWins() {
-	gameplay.player.Win()
+	gameplay.player.Win(gameplay.player.Bet + gameplay.dealer.Bet)
 	gameplay.dealer.RevealSecondCard()
 	allDealerHandSum := gameplay.dealer.GetHandScores()
 	gameplay.ui.RenderDealerCards(allDealerHandSum)
@@ -280,8 +281,7 @@ func (gameplay *SinglePlayer) performDealerWins() {
 }
 
 func (gameplay *SinglePlayer) performDraw() {
-	gameplay.player.Bet /= 2
-	gameplay.player.Win()
+	gameplay.player.Win(gameplay.player.Bet)
 	gameplay.dealer.Win()
 	gameplay.dealer.RevealSecondCard()
 	allDealerHandSum := gameplay.dealer.GetHandScores()

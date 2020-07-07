@@ -8,6 +8,7 @@ import (
 type Dealer struct {
 	score int
 	hand  *hand.Hand
+	Bet   int
 }
 
 type SerializableDealer struct {

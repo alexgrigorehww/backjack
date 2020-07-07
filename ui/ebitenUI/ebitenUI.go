@@ -361,12 +361,12 @@ func (ui *EbitenUI) Init() {
 		Color: color.RGBA{0xAA, 0xAA, 0xAA, 0xff},
 	}
 	ui.buttonSave = &Button{
-		Rect:  image.Rect(320, 100, 390, 130),
+		Rect:  image.Rect(320, 300, 390, 330),
 		Text:  "Save Game",
 		Color: color.RGBA{0xAA, 0xAA, 0xAA, 0xff},
 	}
 	ui.buttonRestore = &Button{
-		Rect:  image.Rect(320, 140, 390, 170),
+		Rect:  image.Rect(320, 340, 390, 370),
 		Text:  "Restore",
 		Color: color.RGBA{0xAA, 0xAA, 0xAA, 0xff},
 	}
