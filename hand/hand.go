@@ -36,9 +36,9 @@ func (h *Hand) GetHandCardsSum() int {
 		}
 		s += h.cards[i].GetBlackjackValue()
 	}
-	if s+10+aces > 21 { //s+11+aces-1>21
+	if s+10+aces > 21 && aces != 0 { //s+11+aces-1>21
 		s += aces
-	} else {
+	} else if aces != 0 {
 		s += 10 + aces //11-aces-1
 	}
 	return s

@@ -41,6 +41,15 @@ func TestHand_GetHandCardsSum(t *testing.T) {
 	if h.GetHandCardsSum() != 13 {
 		t.Error("This should be 13.", h.GetHandCardsSum(), h.GetHandCards())
 	}
+	//case: 2+9
+	h = hand.Hand{}
+	c1.SetCard(2, "spades", '♠')
+	h.AddCardToHand(&c1)
+	c2.SetCard(9, "spades", '♠')
+	h.AddCardToHand(&c2)
+	if h.GetHandCardsSum() != 11 {
+		t.Error("This should be 11.", h.GetHandCardsSum(), h.GetHandCards())
+	}
 }
 
 func TestHand_DisplayValues(t *testing.T) {
@@ -86,7 +95,6 @@ func TestHand_DisplayValues(t *testing.T) {
 	//case: 3 aces
 	h = hand.Hand{}
 	c1.SetCard(1, "spades", '♠')
-	c1.IsVisible = true
 	h.AddCardToHand(&c1)
 	h.AddCardToHand(&c1)
 	h.AddCardToHand(&c1)
@@ -109,6 +117,16 @@ func TestHand_DisplayValues(t *testing.T) {
 	c1.SetCard(2, "spades", '♠')
 	h.AddCardToHand(&c1)
 	c2.IsVisible = true
+	c2.SetCard(3, "spades", '♠')
+	c2.IsVisible = false
+	h.AddCardToHand(&c2)
+	if h.DisplayValues()[0] != 2 {
+		t.Error("This should be 2.", h.DisplayValues())
+	}
+	//case: hidden card
+	h = hand.Hand{}
+	c1.SetCard(2, "spades", '♠')
+	h.AddCardToHand(&c1)
 	c2.SetCard(3, "spades", '♠')
 	c2.IsVisible = false
 	h.AddCardToHand(&c2)
