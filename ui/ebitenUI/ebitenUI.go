@@ -5,6 +5,8 @@ import (
 	"image"
 	"image/color"
 	"log"
+	"strconv"
+	"strings"
 
 	"github.com/hajimehoshi/ebiten"
 	"golang.org/x/image/colornames"
@@ -66,7 +68,7 @@ func (ui *EbitenUI) renderBustText(screen *ebiten.Image) {
 		renderBustText = false
 	}
 	if renderBustText {
-		startX, startY := 100, 250
+		startX, startY := 100, 260
 		ui.bustText.Draw(screen, text, startX+75/2, startY+125/2)
 		ui.buttonNewGame.Draw(screen)
 	}
@@ -201,11 +203,15 @@ func (ui *EbitenUI) SetGameplayActions(setBet func(int) error, saveGame func(cha
 }
 
 func (ui *EbitenUI) renderPlayerCards(screen *ebiten.Image) {
-	startX, startY := 100, 165
+	startX, startY := 100, 175
 	if len(ui.playerSums) == 0 {
 		return
 	}
-	cardsSum := ui.playerSums[0]
+	var stringSums []string
+	for _,sum := range ui.playerSums{
+		stringSums = append(stringSums, strconv.Itoa(sum))
+	}
+	cardsSum := strings.Join(stringSums, " / ")
 	for uk, card := range ui.playerCards {
 		if !card.IsVisible {
 			drawNinePatches(screen, image.Rect(startX+25*uk, startY, startX+75+25*uk, startY+125), imageSrcRects[imageTypeButton], colornames.Darkgreen)
@@ -221,11 +227,15 @@ func (ui *EbitenUI) renderPlayerCards(screen *ebiten.Image) {
 }
 
 func (ui *EbitenUI) renderDealerCards(screen *ebiten.Image) {
-	startX, startY := 125, 25
+	startX, startY := 125, 35
 	if len(ui.dealerSums) == 0 {
 		return
 	}
-	cardsSum := ui.dealerSums[0]
+	var stringSums []string
+	for _,sum := range ui.dealerSums{
+		stringSums = append(stringSums, strconv.Itoa(sum))
+	}
+	cardsSum := strings.Join(stringSums, " / ")
 	for uk, card := range ui.dealerCards {
 		if !card.IsVisible {
 			drawNinePatches(screen, image.Rect(startX+25*uk, startY, startX+75+25*uk, startY+125), imageSrcRects[imageTypeButton], colornames.Darkgreen)
