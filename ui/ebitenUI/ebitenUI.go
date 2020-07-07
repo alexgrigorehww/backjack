@@ -22,6 +22,7 @@ type EbitenUI struct {
 	dealerSums  []int
 	playerSums  []int
 
+	buttonAbout   *Button
 	buttonNewGame *Button
 	buttonStand   *Button
 	buttonHit     *Button
@@ -252,6 +253,7 @@ func (ui *EbitenUI) renderSetBet(screen *ebiten.Image) {
 	if ui.status != "set_bet" {
 		return
 	}
+	ui.buttonAbout.Draw(screen)
 	ui.buttonSetBet1.Draw(screen)
 	ui.buttonSetBet2.Draw(screen)
 	ui.buttonSetBet3.Draw(screen)
@@ -288,6 +290,7 @@ func (ui *EbitenUI) update(screen *ebiten.Image) error {
 	screen.Fill(color.RGBA{0xeb, 0xeb, 0xeb, 0xff})
 
 	// UI elements
+	ui.buttonAbout.Draw(screen)
 	ui.score.Draw(screen, ui.walletAmount)
 	ui.renderDealerCards(screen)
 	ui.renderPlayerCards(screen)
@@ -302,6 +305,11 @@ func (ui *EbitenUI) update(screen *ebiten.Image) error {
 
 // Init initializes the UI
 func (ui *EbitenUI) Init() {
+	ui.buttonAbout = &Button{
+		Rect:  image.Rect(0, 0, 70, 30),
+		Text:  "About",
+		Color: color.RGBA{0x88, 0x88, 0x88, 0xff},
+	}
 	ui.buttonNewGame = &Button{
 		Rect:  image.Rect(20, 355, 90, 385),
 		Text:  "New Game",
