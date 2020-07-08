@@ -34,5 +34,5 @@ type Score struct {
 
 func (s *Score) Draw(dst *ebiten.Image, walletMoney int) {
 	scoreStr := fmt.Sprintf("%04d", walletMoney)
-	text.Draw(dst, scoreStr, arcadeFont, screenWidth-len(scoreStr)*s.fontSize, s.fontSize+30, color.Black)
+	text.Draw(dst, scoreStr, arcadeFont, screenWidth-len(scoreStr)*s.fontSize, s.fontSize, color.Black)
 }

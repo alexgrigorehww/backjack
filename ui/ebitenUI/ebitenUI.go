@@ -68,7 +68,7 @@ func (ui *EbitenUI) renderBustText(screen *ebiten.Image) {
 		renderBustText = false
 	}
 	if renderBustText {
-		startX, startY := 100, 260
+		startX, startY := 100, 280
 		ui.bustText.Draw(screen, text, startX+75/2, startY+125/2)
 		ui.buttonNewGame.Draw(screen)
 		ui.buttonNewGame.Update()
@@ -204,7 +204,7 @@ func (ui *EbitenUI) SetGameplayActions(setBet func(int) error, saveGame func(cha
 }
 
 func (ui *EbitenUI) renderPlayerCards(screen *ebiten.Image) {
-	startX, startY := 100, 175
+	startX, startY := 100, 195
 	if len(ui.playerSums) == 0 {
 		return
 	}
@@ -228,7 +228,7 @@ func (ui *EbitenUI) renderPlayerCards(screen *ebiten.Image) {
 }
 
 func (ui *EbitenUI) renderDealerCards(screen *ebiten.Image) {
-	startX, startY := 125, 35
+	startX, startY := 125, 55
 	if len(ui.dealerSums) == 0 {
 		return
 	}
@@ -336,37 +336,37 @@ func (ui *EbitenUI) Init() {
 		Color: color.RGBA{0xAA, 0xAA, 0xAA, 0xff},
 	}
 	ui.buttonSetBet1 = &Button{
-		Rect:  image.Rect(50, 250, 100, 285),
+		Rect:  image.Rect(50, 350, 100, 385),
 		Text:  "5",
 		Color: color.RGBA{0x88, 0x88, 0x88, 0xff},
 	}
 	ui.buttonSetBet2 = &Button{
-		Rect:  image.Rect(110, 250, 160, 285),
+		Rect:  image.Rect(110, 350, 160, 385),
 		Text:  "10",
 		Color: color.RGBA{0x88, 0x88, 0x88, 0xff},
 	}
 	ui.buttonSetBet3 = &Button{
-		Rect:  image.Rect(170, 250, 220, 285),
+		Rect:  image.Rect(170, 350, 220, 385),
 		Text:  "20",
 		Color: color.RGBA{0xAA, 0xAA, 0xAA, 0xff},
 	}
 	ui.buttonSetBet4 = &Button{
-		Rect:  image.Rect(230, 250, 280, 285),
+		Rect:  image.Rect(230, 350, 280, 385),
 		Text:  "50",
 		Color: color.RGBA{0xAA, 0xAA, 0xAA, 0xff},
 	}
 	ui.buttonDeal = &Button{
-		Rect:  image.Rect(230, 150, 330, 185),
+		Rect:  image.Rect(230, 350, 330, 385),
 		Text:  "Deal!",
 		Color: color.RGBA{0xAA, 0xAA, 0xAA, 0xff},
 	}
 	ui.buttonSave = &Button{
-		Rect:  image.Rect(320, 300, 390, 330),
+		Rect:  image.Rect(320, 310, 390, 340),
 		Text:  "Save Game",
 		Color: color.RGBA{0xAA, 0xAA, 0xAA, 0xff},
 	}
 	ui.buttonRestore = &Button{
-		Rect:  image.Rect(320, 340, 390, 370),
+		Rect:  image.Rect(320, 350, 390, 380),
 		Text:  "Restore",
 		Color: color.RGBA{0xAA, 0xAA, 0xAA, 0xff},
 	}
