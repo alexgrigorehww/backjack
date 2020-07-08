@@ -71,6 +71,7 @@ func (ui *EbitenUI) renderBustText(screen *ebiten.Image) {
 		startX, startY := 100, 260
 		ui.bustText.Draw(screen, text, startX+75/2, startY+125/2)
 		ui.buttonNewGame.Draw(screen)
+		ui.buttonNewGame.Update()
 	}
 
 }
@@ -208,7 +209,7 @@ func (ui *EbitenUI) renderPlayerCards(screen *ebiten.Image) {
 		return
 	}
 	var stringSums []string
-	for _,sum := range ui.playerSums{
+	for _, sum := range ui.playerSums {
 		stringSums = append(stringSums, strconv.Itoa(sum))
 	}
 	cardsSum := strings.Join(stringSums, " / ")
@@ -232,7 +233,7 @@ func (ui *EbitenUI) renderDealerCards(screen *ebiten.Image) {
 		return
 	}
 	var stringSums []string
-	for _,sum := range ui.dealerSums{
+	for _, sum := range ui.dealerSums {
 		stringSums = append(stringSums, strconv.Itoa(sum))
 	}
 	cardsSum := strings.Join(stringSums, " / ")
@@ -257,6 +258,9 @@ func (ui *EbitenUI) renderHitOrStand(screen *ebiten.Image) {
 	}
 	ui.buttonHit.Draw(screen)
 	ui.buttonStand.Draw(screen)
+
+	ui.buttonStand.Update()
+	ui.buttonHit.Update()
 }
 
 func (ui *EbitenUI) renderSetBet(screen *ebiten.Image) {
@@ -270,6 +274,13 @@ func (ui *EbitenUI) renderSetBet(screen *ebiten.Image) {
 	ui.buttonSetBet4.Draw(screen)
 	ui.buttonSave.Draw(screen)
 	ui.buttonRestore.Draw(screen)
+
+	ui.buttonSetBet1.Update()
+	ui.buttonSetBet2.Update()
+	ui.buttonSetBet3.Update()
+	ui.buttonSetBet4.Update()
+	ui.buttonSave.Update()
+	ui.buttonRestore.Update()
 }
 
 func (ui *EbitenUI) renderDeal(screen *ebiten.Image) {
@@ -277,21 +288,10 @@ func (ui *EbitenUI) renderDeal(screen *ebiten.Image) {
 		return
 	}
 	ui.buttonDeal.Draw(screen)
-
+	ui.buttonDeal.Update()
 }
 
 func (ui *EbitenUI) update(screen *ebiten.Image) error {
-	ui.buttonNewGame.Update()
-	ui.buttonStand.Update()
-	ui.buttonHit.Update()
-	ui.buttonSetBet1.Update()
-	ui.buttonSetBet2.Update()
-	ui.buttonSetBet3.Update()
-	ui.buttonSetBet4.Update()
-	ui.buttonDeal.Update()
-	ui.buttonSave.Update()
-	ui.buttonRestore.Update()
-
 	if ebiten.IsDrawingSkipped() {
 		return nil
 	}
